@@ -104,8 +104,6 @@ include "{{ file }}";
 {% endfor %}
 {% if bind_zones is defined %}
 {% for bind_zone in bind_zones %}
-
-{% if bind_zone.create_forward_zones is not defined or bind_zone.create_forward_zones %}
 {# Start: set zone type  #}
 {% set _all_addresses = ansible_all_ipv4_addresses | union(ansible_all_ipv6_addresses) %}
 {% if bind_zone.type is defined and bind_zone.type == 'primary' %}
@@ -122,6 +120,8 @@ include "{{ file }}";
 {% set _type = 'forward' %}
 {% endif %}
 {# End: set zone type #}
+
+{% if bind_zone.create_forward_zones is not defined or bind_zone.create_forward_zones %}
 zone "{{ bind_zone.name }}" IN {
 {% if _type == 'primary' %}
   type master;
