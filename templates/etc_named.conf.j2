@@ -74,10 +74,11 @@ logging {
 {% if bind_query_log.file is defined %}
     file "{{ bind_query_log.file }}" versions {{ bind_query_log.versions }} size {{ bind_query_log.size }};
 {% else %}
-    file "{{ bind_query_log }}" versions 600 size 20m;
+    file "{{ bind_query_log }}" versions 100 size 25m;
 {% endif %}
-    severity dynamic;
+    severity info;
     print-time yes;
+    print-severity yes;
   };
   category queries { querylog; };
 {% endif %}
