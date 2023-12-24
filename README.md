@@ -41,7 +41,6 @@ The packages `python-netaddr` (required for the [`ipaddr`](https://docs.ansible.
 | `bind_dns_keys`             | `[]`                 | A list of binding keys, which are mappings with keys `name:` `algorithm:` and `secret:`. See below for an example.                   |
 | `bind_dns64`                | `false`              | If `true`, support for [DNS64](https://www.oreilly.com/library/view/dns-and-bind/9781449308025/ch04.html) is enabled                 |
 | `bind_dns64_clients`        | `['any']`            | A list of clients which the DNS64 function applies to (can be any ACL)                                                               |
-| `bind_dnssec_enable`        | `true`               | If `true`, DNSSEC is enabled                                                                                                         |
 | `bind_dnssec_validation`    | `true`               | If `true`, DNSSEC validation is enabled                                                                                              |
 | `bind_extra_include_files`  | `[]`                 | A list of custom config files to be included from the main config file                                                               |
 | `bind_forward_only`         | `false`              | If `true`, BIND is set up as a caching name server                                                                                   |
