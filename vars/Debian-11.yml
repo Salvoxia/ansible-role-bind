@@ -5,7 +5,7 @@ bind_packages:
   - "{{ ( bind_python_version == '3' ) | ternary( 'python3-netaddr', 'python-netaddr' ) }}"
   - "{{ ( bind_python_version == '3' ) | ternary( 'python3-dnspython', 'python-dnspython' ) }}"
   - bind9
-  - bind9utils
+  - bind9-utils
 
 bind_service: named
 
