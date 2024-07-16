@@ -5,11 +5,13 @@ server {{ primary }} {
   keys { {{ bind_key_mapping[primary] }}; };
 };
 {% endfor %}
-
 {% endif %}
+
+{% if not (ansible_default_ipv4.address in bind_key_mapping) %}
 server {{ ansible_default_ipv4.address }} {
   keys { {% for mykey in bind_dns_keys %} {{ mykey.name }}; {% endfor %} };
 };
+{% endif %}
 
 {% for mykey in bind_dns_keys %}
 key {{ mykey.name }} {
