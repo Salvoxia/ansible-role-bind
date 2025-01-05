@@ -92,6 +92,18 @@
   notify: reload bind
   tags: bind
 
+- ansible.builtin.service_facts:
+
+- name: Freeze dynamic zones
+  command:
+    cmd: 'rndc freeze {{ item.name }}'
+  become: yes
+  failed_when: false
+  when: >-
+    (ansible_facts.services["named.service"].state == "running") and (item.allow_update | default(false))
+  with_items: '{{ bind_zones }}'
+  tags: bind
+
 - name: Configure zones
   include_tasks: zones.yml
   tags: bind
@@ -116,3 +128,13 @@
     enabled: true
   become: yes
   tags: bind
+
+- name: Thaw dynamic zones
+  command:
+    cmd: 'rndc thaw {{ item.name }}'
+  become: yes
+  when: >-
+    (ansible_facts.services["named.service"].state == "running") and (item.allow_update | default(false))
+  with_items: '{{ bind_zones }}'
+  tags: bind
+
