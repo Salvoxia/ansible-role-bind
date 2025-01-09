@@ -7,7 +7,7 @@ bind_packages:
   - bind
   - bind-utils
 
-bind_service: named
+bind_service: named.service
 
 # Main config file
 bind_config: /etc/named.conf
