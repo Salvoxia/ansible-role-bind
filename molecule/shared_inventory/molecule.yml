@@ -32,6 +32,7 @@ platforms:
       - ${PWD}:/etc/ansible/roles/bertvv.bind:ro
       - ${PWD}/library:/root/.ansible/plugins/modules:ro
     privileged: true
+    cgroupns_mode: host
     pre_build_image: true
     tty: true
     environment:
@@ -51,6 +52,7 @@ platforms:
       - ${PWD}:/etc/ansible/roles/bertvv.bind:ro
       - ${PWD}/library:/root/.ansible/plugins/modules:ro
     privileged: true
+    cgroupns_mode: host
     pre_build_image: true
     tty: true
     environment:
