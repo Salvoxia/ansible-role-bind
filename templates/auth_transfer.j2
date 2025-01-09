@@ -1,13 +1,14 @@
 // {{ ansible_managed }}
 {% if bind_key_mapping | length > 0 %}
 {% for primary in bind_key_mapping.keys() %}
-server {{ primary }} {
+server {{ primary | regex_replace('^(\\S*)( .*)?$', '\\1') }} {
   keys { {{ bind_key_mapping[primary] }}; };
 };
 {% endfor %}
 {% endif %}
-
-{% if not (ansible_default_ipv4.address in bind_key_mapping) %}
+{# Clean up bind key mapping #}
+{% set _cleaned_bind_key_mapping = bind_key_mapping.keys() | map('regex_replace', '^(\\S*)( .*)?$', '\\1') | list | zip(bind_key_mapping.keys()) | community.general.dict %}
+{% if not (ansible_default_ipv4.address in _cleaned_bind_key_mapping) %}
 server {{ ansible_default_ipv4.address }} {
   keys { {{ bind_dns_keys[0].name }}  };
 };

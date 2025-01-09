@@ -109,7 +109,10 @@ include "{{ file }}";
 {% endfor %}
 {% if bind_zones is defined %}
 {% for bind_zone in bind_zones %}
-
+{# Generate a dict of raw primary IP addresses to actual primary entries in the zone (that may be follow by e.g. a port specification) #}
+{% if bind_zone.primaries is defined %}
+{% set _cleaned_up_primaries = bind_zone.primaries | map('regex_replace', '^(\\S*)( .*)?$', '\\1') | list | zip(bind_zone.primaries) | community.general.dict %}
+{% endif %}
 {% if bind_zone.create_forward_zones is not defined or bind_zone.create_forward_zones %}
 {# Start: set zone type  #}
 {% if bind_zone.type is defined and bind_zone.type == 'primary' %}
@@ -118,9 +121,9 @@ include "{{ file }}";
 {% set _type = 'secondary' %}
 {% elif bind_zone.type is defined and bind_zone.type == 'forward' %}
 {% set _type = 'forward' %}
-{% elif bind_zone.type is not defined and bind_zone.primaries is defined and (host_all_addresses|intersect(bind_zone.primaries)|length > 0) %}
+{% elif bind_zone.type is not defined and bind_zone.primaries is defined and (host_all_addresses|intersect(_cleaned_up_primaries)|length > 0) %}
 {% set _type = 'primary' %}
-{% elif bind_zone.type is not defined and bind_zone.primaries is defined and not (host_all_addresses|intersect(bind_zone.primaries)|length > 0) %}
+{% elif bind_zone.type is not defined and bind_zone.primaries is defined and not (host_all_addresses|intersect(_cleaned_up_primaries)|length > 0) %}
 {% set _type = 'secondary' %}
 {% elif bind_zone.type is not defined and bind_zone.forwarders is defined %}
 {% set _type = 'forward' %}
@@ -129,12 +132,12 @@ include "{{ file }}";
 
 {# Start: set mapped primaries for the zone #}
 {% if bind_key_mapping | length != 0 %}
-{% set _mapped_zone_primaries = bind_key_mapping.keys() | intersect(bind_zone.primaries) %}
+{% set _mapped_zone_primaries = _cleaned_up_primaries | dict2items | selectattr('value', 'in', bind_key_mapping.keys()) | items2dict %}
 {% else %}
 {% set _mapped_zone_primaries = [] %}
 {% endif %}
 {# End: set mapped primaries for the zone #}
-
+{# {{ _mapped_zone_primaries }} #}
 zone "{{ bind_zone.name }}" IN {
 {% if _type == 'primary' %}
   type master;
@@ -151,7 +154,7 @@ zone "{{ bind_zone.name }}" IN {
 {% endfor %}
 {% endif %}
 {% for primary in host_all_addresses | intersect(_mapped_zone_primaries) %}
-    key {{ bind_key_mapping[primary] }};
+    key {{ bind_key_mapping[_cleaned_up_primaries[primary]] }};
 {% endfor %}
   };
 {% endif %}
@@ -160,7 +163,7 @@ zone "{{ bind_zone.name }}" IN {
 {% for secondary in bind_zone.also_notify %}
 {% if host_all_addresses | intersect(_mapped_zone_primaries) | length != 0 %}
 {% for primary in host_all_addresses | intersect(_mapped_zone_primaries) %}
-    {{ secondary }} key {{ bind_key_mapping[primary] }};
+    {{ secondary }} key {{ bind_key_mapping[_cleaned_up_primaries[primary]] }};
 {% endfor %}
 {% else %}
     {{ secondary }};
@@ -205,7 +208,7 @@ zone "{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr
 {% endfor %}
 {% endif %}
 {% for primary in host_all_addresses | intersect(_mapped_zone_primaries) %}
-    key {{ bind_key_mapping[primary] }};
+    key {{ bind_key_mapping[_cleaned_up_primaries[primary]] }};
 {% endfor %}
   };
 {% endif %}
@@ -214,7 +217,7 @@ zone "{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr
 {% for secondary in bind_zone.also_notify %}
 {% if host_all_addresses | intersect(_mapped_zone_primaries) | length != 0 %}
 {% for primary in host_all_addresses | intersect(_mapped_zone_primaries) %}
-    {{ secondary }} key {{ bind_key_mapping[primary] }};
+    {{ secondary }} key {{ bind_key_mapping[_cleaned_up_primaries[primary]] }};
 {% endfor %}
 {% else %}
     {{ secondary }};
@@ -260,7 +263,7 @@ zone "{{ (network | ansible.utils.ipaddr('revdns'))[-(9+(network|regex_replace('
 {% endfor %}
 {% endif %}
 {% for primary in host_all_addresses | intersect(_mapped_zone_primaries) %}
-    key {{ bind_key_mapping[primary] }};
+    key {{ bind_key_mapping[_cleaned_up_primaries[primary]] }};
 {% endfor %}
   };
 {% endif %}
@@ -269,7 +272,7 @@ zone "{{ (network | ansible.utils.ipaddr('revdns'))[-(9+(network|regex_replace('
 {% for secondary in bind_zone.also_notify %}
 {% if host_all_addresses | intersect(_mapped_zone_primaries) | length != 0 %}
 {% for primary in host_all_addresses | intersect(_mapped_zone_primaries) %}
-    {{ secondary }} key {{ bind_key_mapping[primary] }};
+    {{ secondary }} key {{ bind_key_mapping[_cleaned_up_primaries[primary]] }};
 {% endfor %}
 {% else %}
     {{ secondary }};
