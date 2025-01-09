@@ -23,7 +23,7 @@ jobs:
           - ubuntu2204
           - ubuntu2404
         ansible_version:
-          - 10
+          - 10.7.0
           - latest
         exclude:
           - distro: centos8
