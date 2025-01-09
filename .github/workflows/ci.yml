@@ -22,22 +22,7 @@ jobs:
           - debian12
           - ubuntu2204
           - ubuntu2404
-        ansible_version:
-          - 9.13.0
-          - latest
-        exclude:
-          - distro: centos8
-            ansible_core_version: latest
-          - distro: debian10
-            ansible_core_version: latest
-          - distro: debian11
-            ansible_core_version: 9.13.0
-          - distro: debian12
-            ansible_core_version: 9.13.0
-          - distro: ubuntu2204
-            ansible_core_version: 9.13.0
-          - distro: ubuntu2404
-            ansible_core_version: 9.13.0
+
     steps:
       - name: Check out the codebase.
         uses: actions/checkout@v4
