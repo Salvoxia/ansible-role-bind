@@ -134,7 +134,7 @@
     cmd: 'rndc thaw {{ item.name }}'
   become: yes
   when: >-
-    (ansible_facts.services["named.service"].state == "running") and (item.allow_update | default(false))
+    (ansible_facts.services[bind_service].state == "running") and (item.allow_update | default(false))
   with_items: '{{ bind_zones }}'
   tags: bind
 
