@@ -6,6 +6,8 @@ name: CI
   push:
     branches:
       - master
+  schedule:
+    - cron: "31 3 * * 1"
 
 jobs:
 
@@ -34,11 +36,11 @@ jobs:
 
       - name: Install test dependencies (CentOS 8).
         run: pip3 install ansible==9.13.0 molecule molecule-docker yamllint ansible-lint docker netaddr dnspython
-        if: matrix.distro == 'centos8'
+        if: matrix.distro in ['debian10', 'centos8']
 
       - name: Install test dependencies.
         run: pip3 install ansible molecule molecule-docker yamllint ansible-lint docker netaddr dnspython
-        if: matrix.distro != 'centos8'
+        if: matrix.distro not in ['debian10', 'centos8']
 
       - name: Run Molecule Primary/Secondary/Forwarder tests
         run: molecule test
