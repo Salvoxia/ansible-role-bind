@@ -16,8 +16,7 @@ jobs:
       fail-fast: false
       matrix:
         distro:
-          - centos9
-          - centos10
+          - centos8
           - debian10
           - debian11
           - debian12
@@ -27,7 +26,7 @@ jobs:
           - 2.16
           - latest
         exclude:
-          - distro: centos9
+          - distro: centos8
             ansible_core_version: latest
           - distro: debian10
             ansible_core_version: latest
