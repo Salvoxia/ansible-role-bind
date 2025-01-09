@@ -23,7 +23,7 @@ jobs:
           - ubuntu2204
           - ubuntu2404
         ansible_version:
-          - 10.7.0
+          - 9.13.0
           - latest
     steps:
       - name: Check out the codebase.
@@ -34,16 +34,13 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Display python version
-        run: /usr/bin/python3 --version
-
-      - name: Install test dependencies.
-        run: pip3 install ansible==${{ matrix.ansible_version }} molecule molecule-docker yamllint ansible-lint docker netaddr dnspython
-        if: matrix.ansible_version != 'latest'
+      - name: Install test dependencies (CentOS 8).
+        run: pip3 install ansible==9.13.0 molecule molecule-docker yamllint ansible-lint docker netaddr dnspython
+        if: matrix.distro == 'centos8'
 
       - name: Install test dependencies.
         run: pip3 install ansible molecule molecule-docker yamllint ansible-lint docker netaddr dnspython
-        if: matrix.ansible_version == 'latest'
+        if: matrix.distro != 'centos8'
 
       - name: Run Molecule Primary/Secondary/Forwarder tests
         run: molecule test
