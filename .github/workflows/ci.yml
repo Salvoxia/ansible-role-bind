@@ -25,11 +25,6 @@ jobs:
         ansible_version:
           - 10.7.0
           - latest
-        exclude:
-          - distro: centos8
-            ansible_version: latest
-          - distro: debian10
-            ansible_version: latest
     steps:
       - name: Check out the codebase.
         uses: actions/checkout@v4
@@ -38,6 +33,9 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.x'
+
+      - name: Display python version
+        run: /usr/bin/python3 --version
 
       - name: Install test dependencies.
         run: pip3 install ansible==${{ matrix.ansible_version }} molecule molecule-docker yamllint ansible-lint docker netaddr dnspython
