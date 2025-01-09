@@ -6,9 +6,8 @@ bind_packages:
   - "{{ ( bind_python_version == '3' ) | ternary( 'python3-dnspython', 'python-dnspython' ) }}"
   - bind9
   - bind9-utils
-  - dnsutils
 
-bind_service: bind9
+bind_service: named
 
 # Main config file
 bind_config: /etc/bind/named.conf
@@ -18,7 +17,7 @@ bind_default_zone_files:
   - /etc/bind/named.conf.default-zones
 
 # Directory with run-time stuff
-bind_dir: /var/lib/bind
+bind_dir: /var/cache/bind
 bind_conf_dir: "/etc/bind"
 auth_file: "auth_transfer.conf"
 bind_auth_file: "{{ bind_conf_dir }}/{{ auth_file }}"
