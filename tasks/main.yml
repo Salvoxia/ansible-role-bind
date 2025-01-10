@@ -110,14 +110,9 @@
   loop_control:
     loop_var: zone
 
-
 - name: Configure zones
   include_tasks: zones.yml
   tags: bind
-
-- name: Show templating results
-  ansible.builtin.debug:
-    msg: "{{ lookup('ansible.builtin.template', 'etc_named.conf.j2') }}"
 
 - name: Main BIND config file
   template:
@@ -148,4 +143,3 @@
     (ansible_facts.services[bind_service].state == "running") and (item.allow_update | default(false))
   with_items: '{{ bind_zones }}'
   tags: bind
-
