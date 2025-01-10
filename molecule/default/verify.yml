@@ -25,16 +25,28 @@
       ansible.builtin.shell: ls -la /var/lib/bind
       when: "inventory_hostname == 'ns2'"
       ignore_errors: true
+      register: result
+
+    - debug:
+        var: result
 
     - name: Show Log file
       ansible.builtin.shell: cat /var/lib/bind/data/named.run
       when: "inventory_hostname == 'ns2'"
       ignore_errors: true
+      register: result
+
+    - debug:
+        var: result
 
     - name: Perform test dig
       ansible.builtin.shell: dig @localhost -p 553 ns1.acme-inc.com
       when: "inventory_hostname == 'ns2'"
       ignore_errors: true
+      register: result
+
+    - debug:
+        var: result
       
     - name: IPv4 Forward lookups
       assert:
