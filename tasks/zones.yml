@@ -98,8 +98,8 @@
   when: >
     (item.create_forward_zones is not defined or item.create_forward_zones) and
     ((item.type is defined and item.type == 'primary') or
-    (item.type is not defined and item.primaries is defined and
-    (host_all_addresses | intersect(item.primaries) | length > 0)))
+    (item.type is not defined and zone_auxiliary[item.name]['primaries_dict'] is defined and
+    (host_all_addresses | intersect(zone_auxiliary[item.name]['primaries_dict'].keys()) | length > 0)))
   notify: reload bind
   tags: bind
 
@@ -123,8 +123,8 @@
   when: >
     (item.create_reverse_zones is not defined or item.create_reverse_zones) and
     ((item[0].type is defined and item[0].type == 'primary') or
-    (item[0].type is not defined and item[0].primaries is defined and
-    (host_all_addresses | intersect(item[0].primaries) | length > 0)))
+    (item[0].type is not defined and zone_auxiliary[item[0].name]['primaries_dict'] is defined and
+    (host_all_addresses | intersect(zone_auxiliary[item[0].name]['primaries_dict'].keys()) | length > 0)))
   notify: reload bind
   tags: bind
 
@@ -148,7 +148,7 @@
   when: >
     (item.create_reverse_zones is not defined or item.create_reverse_zones) and
     ((item[0].type is defined and item[0].type == 'primary') or
-    (item[0].type is not defined and item[0].primaries is defined and
-    (host_all_addresses | intersect(item[0].primaries) | length > 0)))
+    (item[0].type is not defined and zone_auxiliary[item[0].name]['primaries_dict'] is defined and
+    (host_all_addresses | intersect(zone_auxiliary[item[0].name]['primaries_dict'].keys()) | length > 0)))
   notify: reload bind
   tags: bind

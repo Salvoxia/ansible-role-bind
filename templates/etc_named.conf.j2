@@ -109,9 +109,38 @@ include "{{ file }}";
 {% endfor %}
 {% if bind_zones is defined %}
 {% for bind_zone in bind_zones %}
-{# Generate a dict of raw primary IP addresses to actual primary entries in the zone (that may be follow by e.g. a port specification) #}
-{% if bind_zone.primaries is defined %}
-{% set _cleaned_up_primaries = bind_zone.primaries | map('regex_replace', '^(\\S*)( .*)?$', '\\1') | list | zip(bind_zone.primaries) | community.general.dict %}
+{# Generate a list of primaries strings including additional properts (e.g. a port specification) #}
+{% if zone_auxiliary[bind_zone.name] is defined and zone_auxiliary[bind_zone.name]['primaries_dict'] is defined%}
+{% set _primaries = [] %}
+{% for primary in zone_auxiliary[bind_zone.name]['primaries_dict'].values() %}
+{% set primary_string = primary.ip %}
+{% if primary.port is defined %}
+{% set primary_string = primary_string + ' port ' + primary.port | string %}
+{% endif %}
+{% set dummy = _primaries.append(primary_string) %}
+{% endfor %}
+{% endif %}
+{# Build forwarders #}
+{% if zone_auxiliary[bind_zone.name] is defined and zone_auxiliary[bind_zone.name]['forwarders_dict'] is defined%}
+{% set _forwarders = [] %}
+{% for forwarder in zone_auxiliary[bind_zone.name]['forwarders_dict'].values() %}
+{% set forwarder_string = forwarder.ip %}
+{% if forwarder.port is defined %}
+{% set forwarder_string = forwarder_string + ' port ' + forwarder.port | string %}
+{% endif %}
+{% set dummy = _forwarders.append(forwarder_string) %}
+{% endfor %}
+{% endif %}
+{# Build also-notify #}
+{% if zone_auxiliary[bind_zone.name] is defined and zone_auxiliary[bind_zone.name]['also_notify_dict'] is defined%}
+{% set _also_notify = [] %}
+{% for also_notify in zone_auxiliary[bind_zone.name]['also_notify_dict'].values() %}
+{% set also_notify_string = also_notify.ip %}
+{% if also_notify.port is defined %}
+{% set also_notify_string = also_notify_string + ' port ' + also_notify.port | string %}
+{% endif %}
+{% set dummy = _also_notify.append(also_notify_string) %}
+{% endfor %}
 {% endif %}
 {% if bind_zone.create_forward_zones is not defined or bind_zone.create_forward_zones %}
 {# Start: set zone type  #}
@@ -121,9 +150,9 @@ include "{{ file }}";
 {% set _type = 'secondary' %}
 {% elif bind_zone.type is defined and bind_zone.type == 'forward' %}
 {% set _type = 'forward' %}
-{% elif bind_zone.type is not defined and bind_zone.primaries is defined and (host_all_addresses|intersect(_cleaned_up_primaries)|length > 0) %}
+{% elif bind_zone.type is not defined and bind_zone.primaries is defined and (host_all_addresses|intersect(zone_auxiliary[bind_zone.name]['primaries_dict'])|length > 0) %}
 {% set _type = 'primary' %}
-{% elif bind_zone.type is not defined and bind_zone.primaries is defined and not (host_all_addresses|intersect(_cleaned_up_primaries)|length > 0) %}
+{% elif bind_zone.type is not defined and bind_zone.primaries is defined and not (host_all_addresses|intersect(zone_auxiliary[bind_zone.name]['primaries_dict'])|length > 0) %}
 {% set _type = 'secondary' %}
 {% elif bind_zone.type is not defined and bind_zone.forwarders is defined %}
 {% set _type = 'forward' %}
@@ -132,7 +161,7 @@ include "{{ file }}";
 
 {# Start: set mapped primaries for the zone #}
 {% if bind_key_mapping | length != 0 %}
-{% set _mapped_zone_primaries = _cleaned_up_primaries | dict2items | selectattr('value', 'in', bind_key_mapping.keys()) | items2dict %}
+{% set _mapped_zone_primaries = bind_key_mapping.keys() | intersect(zone_auxiliary[bind_zone.name]['primaries_dict']) %}
 {% else %}
 {% set _mapped_zone_primaries = [] %}
 {% endif %}
@@ -140,7 +169,7 @@ include "{{ file }}";
 {# {{ _mapped_zone_primaries }} #}
 zone "{{ bind_zone.name }}" IN {
 {% if _type == 'primary' %}
-  type master;
+  type primary;
   file "{{ bind_zone_dir }}/{{ bind_zone.name }}";
 {% if bind_acls | length == 0 and bind_key_mapping | length == 0 %}
   notify yes;
@@ -154,16 +183,16 @@ zone "{{ bind_zone.name }}" IN {
 {% endfor %}
 {% endif %}
 {% for primary in host_all_addresses | intersect(_mapped_zone_primaries) %}
-    key {{ bind_key_mapping[_cleaned_up_primaries[primary]] }};
+    key {{ bind_key_mapping[primary] }};
 {% endfor %}
   };
 {% endif %}
 {% if bind_zone.also_notify is defined %}
   also-notify {
-{% for secondary in bind_zone.also_notify %}
+{% for secondary in _also_notify %}
 {% if host_all_addresses | intersect(_mapped_zone_primaries) | length != 0 %}
 {% for primary in host_all_addresses | intersect(_mapped_zone_primaries) %}
-    {{ secondary }} key {{ bind_key_mapping[_cleaned_up_primaries[primary]] }};
+    {{ secondary }} key {{ bind_key_mapping[primary] }};
 {% endfor %}
 {% else %}
     {{ secondary }};
@@ -177,14 +206,14 @@ zone "{{ bind_zone.name }}" IN {
   allow-update { none; };
 {% endif %}
 {% elif _type == 'secondary' %}
-  type slave;
+  type secondary;
   notify explicit;
-  masters { {{ bind_zone.primaries|join('; ') }}; };
+  primaries { {{ _primaries | join('; ') }}; };
   file "{{ bind_secondary_dir }}/{{ bind_zone.name }}";
 {% elif _type == 'forward' %}
   type forward;
   forward only;
-  forwarders { {{ bind_zone.forwarders|join('; ') }}; };
+  forwarders { {{ _forwarders | join('; ') }}; };
 {% endif %}
 };
 {% endif %}
@@ -194,7 +223,7 @@ zone "{{ bind_zone.name }}" IN {
 
 zone "{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa" IN {
 {% if _type == 'primary' %}
-  type master;
+  type primary;
   file "{{ bind_zone_dir }}/{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa";
 {% if bind_acls | length == 0 and bind_key_mapping | length == 0 %}
   notify yes;
@@ -208,16 +237,16 @@ zone "{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr
 {% endfor %}
 {% endif %}
 {% for primary in host_all_addresses | intersect(_mapped_zone_primaries) %}
-    key {{ bind_key_mapping[_cleaned_up_primaries[primary]] }};
+    key {{ bind_key_mapping[primary] }};
 {% endfor %}
   };
 {% endif %}
 {% if bind_zone.also_notify is defined %}
   also-notify {
-{% for secondary in bind_zone.also_notify %}
+{% for secondary in _also_notify %}
 {% if host_all_addresses | intersect(_mapped_zone_primaries) | length != 0 %}
 {% for primary in host_all_addresses | intersect(_mapped_zone_primaries) %}
-    {{ secondary }} key {{ bind_key_mapping[_cleaned_up_primaries[primary]] }};
+    {{ secondary }} key {{ bind_key_mapping[primary] }};
 {% endfor %}
 {% else %}
     {{ secondary }};
@@ -231,13 +260,13 @@ zone "{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr
   allow-update { none; };
 {% endif %}
 {% elif _type == 'secondary' %}
-  type slave;
-  masters { {{ bind_zone.primaries|join('; ') }}; };
+  type secondary;
+  primaries { {{ _primaries | join('; ') }}; };
   file "{{ bind_secondary_dir }}/{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa";
 {% elif _type == 'forward' %}
   type forward;
   forward only;
-  forwarders { {{ bind_zone.forwarders|join('; ') }}; };
+  forwarders { {{ _forwarders | join('; ') }}; };
 {% endif %}
 };
 {% endfor %}
@@ -249,7 +278,7 @@ zone "{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr
 
 zone "{{ (network | ansible.utils.ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):] }}" IN {
 {% if _type == 'primary' %}
-  type master;
+  type primary;
   file "{{ bind_zone_dir }}/{{ (network | ansible.utils.ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):-1] }}";
 {% if bind_acls | length == 0 and bind_key_mapping | length == 0 %}
   notify yes;
@@ -263,16 +292,16 @@ zone "{{ (network | ansible.utils.ipaddr('revdns'))[-(9+(network|regex_replace('
 {% endfor %}
 {% endif %}
 {% for primary in host_all_addresses | intersect(_mapped_zone_primaries) %}
-    key {{ bind_key_mapping[_cleaned_up_primaries[primary]] }};
+    key {{ bind_key_mapping[primary] }};
 {% endfor %}
   };
 {% endif %}
 {% if bind_zone.also_notify is defined %}
   also-notify {
-{% for secondary in bind_zone.also_notify %}
+{% for secondary in _also_notify %}
 {% if host_all_addresses | intersect(_mapped_zone_primaries) | length != 0 %}
 {% for primary in host_all_addresses | intersect(_mapped_zone_primaries) %}
-    {{ secondary }} key {{ bind_key_mapping[_cleaned_up_primaries[primary]] }};
+    {{ secondary }} key {{ bind_key_mapping[primary] }};
 {% endfor %}
 {% else %}
     {{ secondary }};
@@ -286,13 +315,13 @@ zone "{{ (network | ansible.utils.ipaddr('revdns'))[-(9+(network|regex_replace('
   allow-update { none; };
 {% endif %}
 {% elif _type == 'secondary' %}
-  type slave;
-  masters { {{ bind_zone.primaries|join('; ') }}; };
+  type secondary;
+  primaries { {{ _primaries | join('; ') }}; };
   file "{{ bind_secondary_dir }}/{{ (network | ansible.utils.ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):-1] }}";
 {% elif _type == 'forward' %}
   type forward;
   forward only;
-  forwarders { {{ bind_zone.forwarders|join('; ') }}; };
+  forwarders { {{ _forwarders | join('; ') }}; };
 {% endif %}
 };
 {% endfor %}

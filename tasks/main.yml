@@ -104,9 +104,20 @@
   with_items: '{{ bind_zones }}'
   tags: bind
 
+- name: Build auxiliary zone dictionary (creates fact zone_auxiliary)
+  ansible.builtin.include_tasks: "build_host_dicts.yml"
+  loop: '{{ bind_zones }}'
+  loop_control:
+    loop_var: zone
+
+
 - name: Configure zones
   include_tasks: zones.yml
   tags: bind
+
+- name: Show templating results
+  ansible.builtin.debug:
+    msg: "{{ lookup('ansible.builtin.template', 'etc_named.conf.j2') }}"
 
 - name: Main BIND config file
   template:
