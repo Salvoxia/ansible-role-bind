@@ -169,7 +169,7 @@ include "{{ file }}";
 {# {{ _mapped_zone_primaries }} #}
 zone "{{ bind_zone.name }}" IN {
 {% if _type == 'primary' %}
-  type primary;
+  type master;
   file "{{ bind_zone_dir }}/{{ bind_zone.name }}";
 {% if bind_acls | length == 0 and bind_key_mapping | length == 0 %}
   notify yes;
@@ -206,7 +206,7 @@ zone "{{ bind_zone.name }}" IN {
   allow-update { none; };
 {% endif %}
 {% elif _type == 'secondary' %}
-  type secondary;
+  type slave;
   notify explicit;
   primaries { {{ _primaries | join('; ') }}; };
   file "{{ bind_secondary_dir }}/{{ bind_zone.name }}";
@@ -223,7 +223,7 @@ zone "{{ bind_zone.name }}" IN {
 
 zone "{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa" IN {
 {% if _type == 'primary' %}
-  type primary;
+  type master;
   file "{{ bind_zone_dir }}/{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa";
 {% if bind_acls | length == 0 and bind_key_mapping | length == 0 %}
   notify yes;
@@ -260,7 +260,7 @@ zone "{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr
   allow-update { none; };
 {% endif %}
 {% elif _type == 'secondary' %}
-  type secondary;
+  type slave;
   primaries { {{ _primaries | join('; ') }}; };
   file "{{ bind_secondary_dir }}/{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa";
 {% elif _type == 'forward' %}
@@ -278,7 +278,7 @@ zone "{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr
 
 zone "{{ (network | ansible.utils.ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):] }}" IN {
 {% if _type == 'primary' %}
-  type primary;
+  type master;
   file "{{ bind_zone_dir }}/{{ (network | ansible.utils.ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):-1] }}";
 {% if bind_acls | length == 0 and bind_key_mapping | length == 0 %}
   notify yes;
@@ -315,7 +315,7 @@ zone "{{ (network | ansible.utils.ipaddr('revdns'))[-(9+(network|regex_replace('
   allow-update { none; };
 {% endif %}
 {% elif _type == 'secondary' %}
-  type secondary;
+  type slave;
   primaries { {{ _primaries | join('; ') }}; };
   file "{{ bind_secondary_dir }}/{{ (network | ansible.utils.ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):-1] }}";
 {% elif _type == 'forward' %}
