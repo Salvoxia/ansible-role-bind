@@ -208,7 +208,7 @@ zone "{{ bind_zone.name }}" IN {
 {% elif _type == 'secondary' %}
   type slave;
   notify explicit;
-  primaries { {{ _primaries | join('; ') }}; };
+  masters { {{ _primaries | join('; ') }}; };
   file "{{ bind_secondary_dir }}/{{ bind_zone.name }}";
 {% elif _type == 'forward' %}
   type forward;
@@ -261,7 +261,7 @@ zone "{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr
 {% endif %}
 {% elif _type == 'secondary' %}
   type slave;
-  primaries { {{ _primaries | join('; ') }}; };
+  masters { {{ _primaries | join('; ') }}; };
   file "{{ bind_secondary_dir }}/{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa";
 {% elif _type == 'forward' %}
   type forward;
@@ -316,7 +316,7 @@ zone "{{ (network | ansible.utils.ipaddr('revdns'))[-(9+(network|regex_replace('
 {% endif %}
 {% elif _type == 'secondary' %}
   type slave;
-  primaries { {{ _primaries | join('; ') }}; };
+  masters { {{ _primaries | join('; ') }}; };
   file "{{ bind_secondary_dir }}/{{ (network | ansible.utils.ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):-1] }}";
 {% elif _type == 'forward' %}
   type forward;
