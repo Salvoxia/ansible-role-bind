@@ -36,6 +36,10 @@ jobs:
         run: pip3 install ansible==9.13.0 molecule molecule-docker yamllint ansible-lint docker netaddr dnspython
         if: matrix.distro == 'centos8' || matrix.distro == 'debian10'
 
+      - name: Install ansible dependencies (CentOS 8 / Debian 10).
+        run: ansible-galaxy collection install community.general>=9.5.0
+        if: matrix.distro == 'centos8' || matrix.distro == 'debian10'
+
       - name: Install test dependencies.
         run: pip3 install ansible molecule molecule-docker yamllint ansible-lint docker netaddr dnspython
         if: matrix.distro != 'centos8' && matrix.distro != 'debian10'
