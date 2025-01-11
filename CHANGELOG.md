@@ -15,6 +15,7 @@ First release of the this fork.
  - [Add handling transfers by ACLs and/or TSIG per primary, with appropriate defaults](https://github.com/Salvoxia/ansible-role-bind/commit/b0778789c440052c6ba6ceb38bd976a8cc37503d) (credit: [Rowan Thorpe](https://github.com/rowanthorpe))
  - [Add two RRL variables with zero-defaults config-handling](https://github.com/Salvoxia/ansible-role-bind/commit/13a8276d87bb2d7ac26f2bde6951db1fe44245a4)
  - [(GH-1)](https://github.com/Salvoxia/ansible-role-bind/pull/1) Allow for specfying zone primaries, forwarders and also_notify servers with non-standard ports
+ - [(GH-2)](https://github.com/Salvoxia/ansible-role-bind/pull/2) Refactored to be `ansible-lint` compliant
 
 ### Modified
  - [Removed obsolete directive dnssec-enable from BIND9 configuration](https://github.com/Salvoxia/ansible-role-bind/commit/c3d8331757b0ac1fee608f9a49932ae79df225ac) (https://serverfault.com/a/1105506) (credit: [Michail Alexakis](https://github.com/drmalex07))
