@@ -1,13 +1,13 @@
 ---
 galaxy_info:
   role_name: bind
-  namespace: bertvv
-  author: Bert Van Vreckem
+  author: salvoxia
   description: >
     Sets up ISC BIND as an authoritative DNS server for one or more domains
     (primary and/or secondary).
   license: BSD
-  min_ansible_version: "2.7"
+  issue_tracker_url: https://github.com/salvoxia/ansible-role-bind/issues
+  min_ansible_version: "2.9"
   platforms:
     - name: Debian
       versions:
@@ -17,8 +17,15 @@ galaxy_info:
     - name: Ubuntu
       versions:
         - jammy
+    - name: EL
+      versions:
+        - "6"
+        - "7"
+        - "8"
   galaxy_tags:
     - dns
     - networking
     - system
+    - bind
+    - bind9
 dependencies: []
