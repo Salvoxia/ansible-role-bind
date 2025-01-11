@@ -16,6 +16,7 @@ First release of the this fork.
  - [Add two RRL variables with zero-defaults config-handling](https://github.com/Salvoxia/ansible-role-bind/commit/13a8276d87bb2d7ac26f2bde6951db1fe44245a4)
  - [(GH-1)](https://github.com/Salvoxia/ansible-role-bind/pull/1) Allow for specfying zone primaries, forwarders and also_notify servers with non-standard ports
  - [(GH-2)](https://github.com/Salvoxia/ansible-role-bind/pull/2) Refactored to be `ansible-lint` compliant
+ - [(GH-3)](https://github.com/Salvoxia/ansible-role-bind/pull/3) Added parameter `bind_max_cache_size` to set global option [`max-cache-size`](https://bind9.readthedocs.io/en/latest/reference.html#namedconf-statement-max-cache-size)
 
 ### Modified
  - [Removed obsolete directive dnssec-enable from BIND9 configuration](https://github.com/Salvoxia/ansible-role-bind/commit/c3d8331757b0ac1fee608f9a49932ae79df225ac) (https://serverfault.com/a/1105506) (credit: [Michail Alexakis](https://github.com/drmalex07))
@@ -28,6 +29,8 @@ First release of the this fork.
  - [Freeze dynamic zones while updating master file](https://github.com/Salvoxia/ansible-role-bind/commit/a53be3e67b93d43ee172b2c272831b6451b779e8) (credit: [Michail Alexakis](https://github.com/drmalex07))
  - [Fix: Use bind_service variable when checking if service is running](https://github.com/Salvoxia/ansible-role-bind/commit/12da5ae0f280c074d94dce607f15cfaf6603e592)
  - [Fix: Distro-specific variables for RedHat](https://github.com/Salvoxia/ansible-role-bind/commit/ddf499979cafcb887d5f861371e86e5935de8979)
+
+
 
 
 # Legacy Changelog for the [original role](https://github.com/bertvv/ansible-role-bind)
