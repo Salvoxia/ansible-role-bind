@@ -4,7 +4,34 @@ This file contains al notable changes to the bind Ansible role.
 
 This file adheres to the guidelines of [http://keepachangelog.com/](http://keepachangelog.com/). Versioning follows [Semantic Versioning](http://semver.org/).  "GH-X" refers to the X'th issue/pull request on the Github project.
 
-## 5.1.0 - 2020-09-17
+Since this is a for of the [original role](https://github.com/bertvv/ansible-role-bind), the versioning scheme has been reset to `1.0.0`. 
+
+## 1.0.0 - 2025-01-11
+
+First release of the this fork.
+
+### Added
+ - [Explicitly add public-facing IP to host_all_addresses to handle NAT/floating-ip](https://github.com/Salvoxia/ansible-role-bind/commit/772495bfdb042b82c9dfb1f21b1b983772037ec3) (credit: [Rowan Thorpe](https://github.com/rowanthorpe))
+ - [Add handling transfers by ACLs and/or TSIG per primary, with appropriate defaults](https://github.com/Salvoxia/ansible-role-bind/commit/b0778789c440052c6ba6ceb38bd976a8cc37503d) (credit: [Rowan Thorpe](https://github.com/rowanthorpe))
+ - [Add two RRL variables with zero-defaults config-handling](https://github.com/Salvoxia/ansible-role-bind/commit/13a8276d87bb2d7ac26f2bde6951db1fe44245a4)
+ - [(GH-1)](https://github.com/Salvoxia/ansible-role-bind/pull/1) Allow for specfying zone primaries, forwarders and also_notify servers with non-standard ports
+
+### Modified
+ - [Removed obsolete directive dnssec-enable from BIND9 configuration](https://github.com/Salvoxia/ansible-role-bind/commit/c3d8331757b0ac1fee608f9a49932ae79df225ac) (https://serverfault.com/a/1105506) (credit: [Michail Alexakis](https://github.com/drmalex07))
+ - [Review vars for Debian-based systems](https://github.com/Salvoxia/ansible-role-bind/commit/e87784178869f433a65ae1108d006b910d0e4db4) (credit: [Michail Alexakis](https://github.com/drmalex07))
+ - [Do not generate NS records inside aliased (DNAME) domains](https://github.com/Salvoxia/ansible-role-bind/commit/87c327a03ff839b6fc13e8b6c91f111f6dff7344) (credit: [Michail Alexakis](https://github.com/drmalex07))
+ - [Use explicit notifications on secondary servers (to avoid notifying self)](https://github.com/Salvoxia/ansible-role-bind/commit/10a6a309ed859c886e51290fecc0cd9d2e91a7c5) (credit: [Michail Alexakis](https://github.com/drmalex07))
+ - [Log queries at info level (if enabled)](https://github.com/Salvoxia/ansible-role-bind/commit/fbebfe09f71f3badfecdd8288d689754f5287504) (credit: [Michail Alexakis](https://github.com/drmalex07))
+ - [Remove duplicate server block in auth_transfer file](https://github.com/Salvoxia/ansible-role-bind/commit/132b20be641fa3273a201661dda1f5fd6540030b) (credit: [Michail Alexakis](https://github.com/drmalex07))
+ - [Fix keys directive in server block (only one key allowed)](https://github.com/Salvoxia/ansible-role-bind/commit/02afcc0c363dc7530fd0fa092397a731a49d3d9b) (credit: [Michail Alexakis](https://github.com/drmalex07))
+ - [Freeze dynamic zones while updating master file](https://github.com/Salvoxia/ansible-role-bind/commit/a53be3e67b93d43ee172b2c272831b6451b779e8) (credit: [Michail Alexakis](https://github.com/drmalex07))
+ - [Fix: Use bind_service variable when checking if service is running](https://github.com/Salvoxia/ansible-role-bind/commit/12da5ae0f280c074d94dce607f15cfaf6603e592)
+ - [Fix: Distro-specific variables for RedHat](https://github.com/Salvoxia/ansible-role-bind/commit/ddf499979cafcb887d5f861371e86e5935de8979)
+
+
+# Legacy Changelog for the [original role](https://github.com/bertvv/ansible-role-bind)
+
+## 5.1.0 - 2021-09-17
 
 This release is long overdue. Apologies to all of you who have been waiting for this!
 
