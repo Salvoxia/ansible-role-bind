@@ -4,6 +4,7 @@ bind_statistics_allow:
   - any
 bind_zone_dir: /var/local/named-zones
 bind_zone_file_mode: '0660'
+bind_max_cache_size: '50%'
 bind_allow_query:
   - any
 bind_listen_ipv4:
