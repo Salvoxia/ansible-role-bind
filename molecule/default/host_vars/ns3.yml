@@ -7,7 +7,8 @@ bind_zones:
   - name: 'example.com'
     forwarders:
       - 10.11.0.1
-      - 10.11.0.2
+      - ip: 10.11.0.2
+        port: 553
     networks:
       - '192.0.2'
     ipv6_networks:
@@ -17,7 +18,8 @@ bind_zones:
     type: forward
     forwarders:
       - 10.11.0.1
-      - 10.11.0.2
+      - ip: 10.11.0.2
+        port: 553
     networks:
       - '10.11'
     ipv6_networks:

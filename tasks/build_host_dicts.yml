@@ -1,0 +1,45 @@
+---
+- name: Build primaries dict
+  when: zone.primaries is defined
+  block:
+    - name: Convert primaries with port
+      ansible.builtin.set_fact:
+        zone_auxiliary: "{{ zone_auxiliary | default({}) | combine( { zone.name: {'primaries_dict': { item.ip: {'ip': item.ip, 'port': item.port | string} } } }, recursive=True) }}"
+      when: item.port is defined
+      with_items: "{{ zone.primaries }}"
+
+    - name: Convert primaries without port
+      ansible.builtin.set_fact:
+        zone_auxiliary: "{{ zone_auxiliary | default({}) | combine( { zone.name: { 'primaries_dict': { item: {'ip': item} } } }, recursive=True) }}"
+      when: item.port is not defined
+      with_items: "{{ zone.primaries }}"
+
+- name: Build also_notify dict
+  when: zone.also_notify is defined
+  block:
+    - name: Convert also_notify with port
+      ansible.builtin.set_fact:
+        zone_auxiliary: "{{ zone_auxiliary | default({}) | combine( { zone.name: {'also_notify_dict': { item.ip: {'ip': item.ip, 'port': item.port | string} } } }, recursive=True) }}"
+      when: item.port is defined
+      with_items: "{{ zone.also_notify }}"
+
+    - name: Convert also_notify without port
+      ansible.builtin.set_fact:
+        zone_auxiliary: "{{ zone_auxiliary | default({}) | combine( { zone.name: { 'also_notify_dict': { item: {'ip': item} } } }, recursive=True) }}"
+      when: item.port is not defined
+      with_items: "{{ zone.also_notify }}"
+
+- name: Build zone forwarders dict
+  when: zone.forwarders is defined
+  block:
+    - name: Convert forwarders with port
+      ansible.builtin.set_fact:
+        zone_auxiliary: "{{ zone_auxiliary | default({}) | combine( { zone.name: {'forwarders_dict': { item.ip: {'ip': item.ip, 'port': item.port | string} } } }, recursive=True) }}"
+      when: item.port is defined
+      with_items: "{{ zone.forwarders }}"
+
+    - name: Convert forwarders without port
+      ansible.builtin.set_fact:
+        zone_auxiliary: "{{ zone_auxiliary | default({}) | combine({zone.name: {'forwarders_dict': {item: {'ip': item}}}}, recursive=True) }}"
+      when: item.port is not defined
+      with_items: "{{ zone.forwarders }}"

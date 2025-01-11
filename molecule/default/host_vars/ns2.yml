@@ -1,6 +1,9 @@
 ---
 # Secondary Configuration
-
+bind_listen_ipv4_port:
+  - 553
+bind_listen_ipv6_port:
+  - 553
 bind_zones:
   # Secondary server for domain example.com (use zone type autodetection)
   - name: 'example.com'

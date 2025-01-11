@@ -2,6 +2,7 @@
 - name: Verify
   hosts: all
   gather_facts: false
+
   tasks:
 
     # Only collect network facts to reduce setup time
@@ -10,21 +11,16 @@
         gather_subset:
           - 'network'
 
-    - name: Set local_dns variable for dig
+    - name: Set local_dns, dns_port variable for dig
       set_fact:
         local_dns: "{{ '@' + ansible_default_ipv4.address }}"
-        dns_port: 53
-
-    - name: Set dns port for ns2
-      ansible.builtin.set_fact:
         dns_port: 553
-      when: "inventory_hostname == 'ns2'"
 
     - name: IPv4 Forward lookups
       assert:
         that:
-          - lookup('dig', 'ns1.acme-inc.com', local_dns, port=dns_port)    == '10.11.0.1'
-          - lookup('dig', 'ns2.acme-inc.com', local_dns, port=dns_port)     == '10.11.0.2'
+          - lookup('dig', 'ns1.acme-inc.com', local_dns, port=dns_port)    == '10.11.0.4'
+          - lookup('dig', 'ns2.acme-inc.com', local_dns, port=dns_port)     == '10.11.0.5'
           - lookup('dig', 'srv001.acme-inc.com', local_dns, port=dns_port)  == '10.11.1.1'
           - lookup('dig', 'srv002.acme-inc.com', local_dns, port=dns_port)  == '10.11.1.2'
           - lookup('dig', 'mail001.acme-inc.com', local_dns, port=dns_port) == '10.11.2.1'
@@ -40,8 +36,8 @@
     - name: IPv4 Reverse lookups
       assert:
         that:
-          - lookup('dig', '10.11.0.1/PTR', local_dns, port=dns_port)  == 'ns1.acme-inc.com.'
-          - lookup('dig', '10.11.0.2/PTR', local_dns, port=dns_port)  == 'ns2.acme-inc.com.'
+          - lookup('dig', '10.11.0.4/PTR', local_dns, port=dns_port)  == 'ns1.acme-inc.com.'
+          - lookup('dig', '10.11.0.5/PTR', local_dns, port=dns_port)  == 'ns2.acme-inc.com.'
           - lookup('dig', '10.11.1.1/PTR', local_dns, port=dns_port)  == 'srv001.acme-inc.com.'
           - lookup('dig', '10.11.1.2/PTR', local_dns, port=dns_port)  == 'srv002.acme-inc.com.'
           - lookup('dig', '10.11.2.1/PTR', local_dns, port=dns_port)  == 'mail001.acme-inc.com.'

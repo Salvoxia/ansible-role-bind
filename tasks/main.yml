@@ -104,6 +104,12 @@
   with_items: '{{ bind_zones }}'
   tags: bind
 
+- name: Build auxiliary zone dictionary (creates fact zone_auxiliary)
+  ansible.builtin.include_tasks: "build_host_dicts.yml"
+  loop: '{{ bind_zones }}'
+  loop_control:
+    loop_var: zone
+
 - name: Configure zones
   include_tasks: zones.yml
   tags: bind
@@ -137,4 +143,3 @@
     (ansible_facts.services[bind_service].state == "running") and (item.allow_update | default(false))
   with_items: '{{ bind_zones }}'
   tags: bind
-

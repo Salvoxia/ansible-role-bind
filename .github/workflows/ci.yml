@@ -4,8 +4,6 @@ name: CI
   workflow_dispatch:
   pull_request:
   push:
-    branches:
-      - master
   schedule:
     - cron: "31 3 * * 1"
 
@@ -38,6 +36,11 @@ jobs:
         run: pip3 install ansible==9.13.0 molecule molecule-docker yamllint ansible-lint docker netaddr dnspython
         if: matrix.distro == 'centos8' || matrix.distro == 'debian10'
 
+      # community.general version >= 9.5.0 is required for the 'dig' lookup filter to support the 'port' parameter
+      - name: Install ansible dependencies (CentOS 8 / Debian 10).
+        run: ansible-galaxy collection install community.general>=9.5.0 --force
+        if: matrix.distro == 'centos8' || matrix.distro == 'debian10'
+
       - name: Install test dependencies.
         run: pip3 install ansible molecule molecule-docker yamllint ansible-lint docker netaddr dnspython
         if: matrix.distro != 'centos8' && matrix.distro != 'debian10'
@@ -51,6 +54,13 @@ jobs:
 
       - name: Run Molecule Shared Inventory tests
         run: molecule test --scenario-name shared_inventory
+        env:
+          PY_COLORS: '1'
+          ANSIBLE_FORCE_COLOR: '1'
+          MOLECULE_DISTRO: ${{ matrix.distro }}
+
+      - name: Run Molecule Shared Inventory tests with non-standard ports
+        run: molecule test --scenario-name shared_inventory_nonstandard_ports
         env:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
