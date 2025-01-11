@@ -1,6 +1,6 @@
 # Ansible Role: BIND
 
-[![CI](https://github.com/Salvoxia/ansible-role-bind/actions/workflows/ci.yml/badge.svg)](https://github.com/Salvoxia/ansible-role-bind/actions/workflows/ci.yml)
+[![CI](https://img.shields.io/github/actions/workflow/status/salvoxia/ansible-role-bind/ci.yml?label=molecule&logo=ansible&style=flat-square)](https://github.com/Salvoxia/ansible-role-bind/actions/workflows/ci.yml)
 [![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/salvoxia/ansible-role-bind?color=EE0000&label=release&logo=ansible&style=flat-square)](https://galaxy.ansible.com/ui/standalone/roles/salvoxia/bind/)
 [![BSD 2-Clause License](https://img.shields.io/badge/License-BSD_2--Clause-orange.svg?style=flat-square)](https://github.com/Salvoxia/ansible-role-bind/blob/main/LICENSE)
 
