@@ -88,3 +88,6 @@ bind_python_version: "{{ bind_default_python_version }}"
 
 # Log file
 bind_log: "data/named.run"
+
+# Global option max-cache-size
+bind_max_cache_size: ""
