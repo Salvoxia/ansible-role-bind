@@ -51,7 +51,8 @@ jobs:
           python-version: '3.x'
 
       - name: Install test dependencies (CentOS 8 / Debian 10).
-        run: pip3 install ansible==9.13.0 molecule molecule-docker yamllint ansible-lint docker netaddr dnspython
+        # ansible-compat==24.10.0 is a temporary workaround for a bug in ansible-compat 25.0/25.1
+        run: pip3 install ansible==9.13.0 molecule molecule-docker yamllint ansible-lint docker netaddr dnspython ansible-compat==24.10.0
         if: matrix.distro == 'centos8' || matrix.distro == 'debian10'
 
       # community.general version >= 9.5.0 is required for the 'dig' lookup filter to support the 'port' parameter
@@ -60,7 +61,8 @@ jobs:
         if: matrix.distro == 'centos8' || matrix.distro == 'debian10'
 
       - name: Install test dependencies.
-        run: pip3 install ansible molecule molecule-docker yamllint ansible-lint docker netaddr dnspython
+        # ansible-compat==24.10.0 is a temporary workaround for a bug in ansible-compat 25.0/25.1
+        run: pip3 install ansible molecule molecule-docker yamllint ansible-lint docker netaddr dnspython ansible-compat==24.10.0
         if: matrix.distro != 'centos8' && matrix.distro != 'debian10'
 
       - name: Run Molecule Primary/Secondary/Forwarder tests
