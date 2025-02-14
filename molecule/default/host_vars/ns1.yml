@@ -15,7 +15,7 @@ bind_zones:
       - ns2.acme-inc.com.
     hostmaster_email: admin
     allow_update:
-      - "key {{ bind_tsig_keys[0].name }}" 
+      - "key {{ bind_tsig_keys[0].name }}"
     hosts:
       - name: srv001
         ip: 192.0.2.1
