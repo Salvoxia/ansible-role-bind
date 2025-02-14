@@ -95,15 +95,12 @@
 - name: Gather current service facts
   ansible.builtin.service_facts:
 
-- name: Freeze dynamic zones
-  ansible.builtin.command:
-    cmd: 'rndc freeze {{ item.name }}'
-  become: true
-  failed_when: false
-  changed_when: false
-  when: >-
-    (ansible_facts.services[bind_service].state == "running") and (item.allow_update | default(false))
-  with_items: '{{ bind_zones }}'
+- name: Get my public IP
+  community.general.ipify_facts:
+
+- name: Set list of all host IP addresses
+  ansible.builtin.set_fact:
+    host_all_addresses: "{{ [ipify_public_ip] | union(ansible_all_ipv4_addresses | union(ansible_all_ipv6_addresses)) }}"
   tags: bind
 
 - name: Build auxiliary zone dictionary (creates fact zone_auxiliary)
@@ -111,6 +108,33 @@
   loop: '{{ bind_zones }}'
   loop_control:
     loop_var: zone
+
+- name: Freeze dynamic zones
+  ansible.builtin.command:
+    cmd: 'rndc freeze {{ item.name }}'
+  become: true
+  failed_when: false
+  changed_when: false
+  when: >-
+    ((item.type is defined and item.type == 'primary') or
+    (item.type is not defined and zone_auxiliary[item.name]['primaries_dict'] is defined and
+    (host_all_addresses | intersect(zone_auxiliary[item.name]['primaries_dict'].keys()) | length > 0))) and
+    (ansible_facts.services[bind_service].state == "running") and (item.allow_update | default(false))
+  with_items: '{{ bind_zones }}'
+  tags: bind
+
+# file to load tsig keys for zone authentication/dynamic/secure update
+- name: Create file for tsig keys for authenticated dynamic updates
+  ansible.builtin.template:
+    src: tsig_keys.j2
+    dest: "{{ bind_conf_dir }}/{{ tsig_file }}"
+    mode: "0640"
+    owner: root
+    group: "{{ bind_group }}"
+  become: true
+  when: bind_tsig_keys is defined and bind_tsig_keys|length > 0
+  notify: Reload bind
+  tags: bind
 
 - name: Configure zones
   ansible.builtin.include_tasks: "zones.yml"
@@ -137,12 +161,21 @@
   become: true
   tags: bind
 
+- name: Flush handlers to reload BIND
+  ansible.builtin.meta: flush_handlers
+
+- name: Synchronize dynamic zones
+  ansible.builtin.include_tasks: "sync_dynamic_zones.yml"
+
 - name: Thaw dynamic zones
   ansible.builtin.command:
     cmd: 'rndc thaw {{ item.name }}'
   become: true
   changed_when: false
   when: >-
+    ((item.type is defined and item.type == 'primary') or
+    (item.type is not defined and zone_auxiliary[item.name]['primaries_dict'] is defined and
+    (host_all_addresses | intersect(zone_auxiliary[item.name]['primaries_dict'].keys()) | length > 0))) and
     (ansible_facts.services[bind_service].state == "running") and (item.allow_update | default(false))
   with_items: '{{ bind_zones }}'
   tags: bind
