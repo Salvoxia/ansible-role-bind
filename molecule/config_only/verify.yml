@@ -1,0 +1,91 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    - name: Include role variables
+      ansible.builtin.include_vars: "../../defaults/main.yml"
+
+    - name: Include group variables
+      ansible.builtin.include_vars: "group_vars/all.yml"
+
+    - name: Source specific variables
+      ansible.builtin.include_vars: "{{ item }}"
+      with_first_found:
+        - files:
+            - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
+            - "{{ ansible_distribution }}.yml"
+            - "{{ ansible_os_family }}-{{ ansible_distribution_major_version }}.yml"
+            - "{{ ansible_os_family }}.yml"
+            - "{{ ansible_distribution_file_variety }}-{{ ansible_distribution_major_version }}.yml"
+            - "{{ ansible_distribution_file_variety }}.yml"
+          paths:
+            - "../../vars"
+
+    - name: Gather Package Facts
+      ansible.builtin.package_facts:
+
+    - name: Verify BIND packages are not installed
+      ansible.builtin.assert:
+        that: ansible_facts.packages[item] is not defined
+      with_items: "{{ bind_packages }}"
+
+    - name: Checking whether bind_conf_dir exists
+      ansible.builtin.stat:
+        path: "{{ bind_conf_dir }}"
+      register: bind_conf_dir_check
+
+    - name: Checking whether bind_config exists
+      ansible.builtin.stat:
+        path: "{{ bind_config }}"
+      register: bind_config_check
+
+    - name: Verify bind config folder and file existence
+      ansible.builtin.assert:
+        that:
+          - bind_conf_dir_check.stat is defined
+          - bind_conf_dir_check.stat.isdir
+          - bind_config_check.stat is defined
+          - not bind_config_check.stat.isdir
+
+      with_items: "{{ bind_zones }}"
+    - name: Detect whether host is a primary
+      ansible.builtin.set_fact:
+        is_primary: true
+      when:
+        - item.primaries | intersect(ansible_all_ipv4_addresses) | length > 0
+        - is_primary is not defined
+      with_items: "{{ bind_zones }}"
+
+    - name: Detect whether host is a secondary
+      ansible.builtin.set_fact:
+        is_secondary: true
+      when:
+        - item.primaries | intersect(ansible_all_ipv4_addresses) | length == 0
+        - is_secondary is not defined
+      with_items: "{{ bind_zones }}"
+
+    - name: Checking that config file contains primary type
+      ansible.builtin.lineinfile:
+        path: "{{ bind_config }}"
+        line: "  type master;"
+        state: present
+      check_mode: true
+      register: is_primary_config_present
+      failed_when: is_primary_config_present is changed or is_primary_config_present is failed
+      when:
+        - is_primary is defined
+        - is_primary
+
+    - name: Checking that config file contains secondary type
+      ansible.builtin.lineinfile:
+        path: "{{ bind_config }}"
+        line: "  type slave;"
+        state: present
+      check_mode: true
+      register: is_secondary_config_present
+      failed_when: is_secondary_config_present is changed or is_secondary_config_present is failed
+      when:
+        - is_secondary is defined
+        - is_secondary

@@ -38,6 +38,7 @@ The packages `python-netaddr` (required for the [`ansible.utils.ipaddr`](https:/
 
 | Variable                    | Default              | Comments (type)                                                                                                                      |
 | :-------------------------- | :------------------- | :----------------------------------------------------------------------------------------------------------------------------------- |
+| `bind_manage_service`       | `true`               | Indicating whether to install, start and enable bind. If set to `false`, only the configuration is generated (but not verified).     |
 | `bind_acls`                 | `[]`                 | A list of ACL definitions, which are mappings with keys `name:` and `match_list:`. See below for an example.                         |
 | `bind_allow_query`          | `['localhost']`      | A list of hosts that are allowed to query this DNS server. Set to ['any'] to allow all hosts                                         |
 | `bind_allow_recursion`      | `['any']`            | Similar to `bind_allow_query`, this option applies to recursive queries.                                                             |

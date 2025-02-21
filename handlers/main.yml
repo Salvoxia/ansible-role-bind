@@ -5,3 +5,4 @@
     name: "{{ bind_service }}"
     state: reloaded
   become: true
+  when: bind_manage_service

@@ -7,8 +7,8 @@
   when: >
     (item.create_forward_zones is not defined or item.create_forward_zones) and
     ((item.type is defined and item.type == 'primary') or
-    (item.type is not defined and zone_auxiliary[item.name]['primaries_dict'] is defined and
-    (host_all_addresses | intersect(zone_auxiliary[item.name]['primaries_dict'].keys()) | length > 0))) and
+    (item.type is not defined and bind_zone_auxiliary[item.name]['primaries_dict'] is defined and
+    (host_all_addresses | intersect(bind_zone_auxiliary[item.name]['primaries_dict'].keys()) | length > 0))) and
     item.update_policy is defined or item.allow_update is defined
   notify: Reload bind
   changed_when: false
@@ -26,8 +26,8 @@
   when: >
     (item.create_reverse_zones is not defined or item.create_reverse_zones) and
     ((item[0].type is defined and item[0].type == 'primary') or
-    (item[0].type is not defined and zone_auxiliary[item[0].name]['primaries_dict'] is defined and
-    (host_all_addresses | intersect(zone_auxiliary[item[0].name]['primaries_dict'].keys()) | length > 0))) and
+    (item[0].type is not defined and bind_zone_auxiliary[item[0].name]['primaries_dict'] is defined and
+    (host_all_addresses | intersect(bind_zone_auxiliary[item[0].name]['primaries_dict'].keys()) | length > 0))) and
     item[0].update_policy is defined or item[0].allow_update is defined
   notify: Reload bind
   changed_when: false
@@ -45,8 +45,8 @@
   when: >
     (item.create_reverse_zones is not defined or item.create_reverse_zones) and
     ((item[0].type is defined and item[0].type == 'primary') or
-    (item[0].type is not defined and zone_auxiliary[item[0].name]['primaries_dict'] is defined and
-    (host_all_addresses | intersect(zone_auxiliary[item[0].name]['primaries_dict'].keys()) | length > 0))) and
+    (item[0].type is not defined and bind_zone_auxiliary[item[0].name]['primaries_dict'] is defined and
+    (host_all_addresses | intersect(bind_zone_auxiliary[item[0].name]['primaries_dict'].keys()) | length > 0))) and
     item[0].update_policy is defined or item[0].allow_update is defined
   notify: Reload bind
   changed_when: false

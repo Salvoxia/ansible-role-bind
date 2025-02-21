@@ -117,9 +117,9 @@ include "{{ bind_tsig_file }}";
 {% if bind_zones is defined %}
 {% for bind_zone in bind_zones %}
 {# Generate a list of primaries strings including additional properts (e.g. a port specification) #}
-{% if zone_auxiliary[bind_zone.name] is defined and zone_auxiliary[bind_zone.name]['primaries_dict'] is defined%}
+{% if bind_zone_auxiliary[bind_zone.name] is defined and bind_zone_auxiliary[bind_zone.name]['primaries_dict'] is defined%}
 {% set _primaries = [] %}
-{% for primary in zone_auxiliary[bind_zone.name]['primaries_dict'].values() %}
+{% for primary in bind_zone_auxiliary[bind_zone.name]['primaries_dict'].values() %}
 {% set primary_string = primary.ip %}
 {% if primary.port is defined %}
 {% set primary_string = primary_string + ' port ' + primary.port | string %}
@@ -128,9 +128,9 @@ include "{{ bind_tsig_file }}";
 {% endfor %}
 {% endif %}
 {# Build forwarders #}
-{% if zone_auxiliary[bind_zone.name] is defined and zone_auxiliary[bind_zone.name]['forwarders_dict'] is defined%}
+{% if bind_zone_auxiliary[bind_zone.name] is defined and bind_zone_auxiliary[bind_zone.name]['forwarders_dict'] is defined%}
 {% set _forwarders = [] %}
-{% for forwarder in zone_auxiliary[bind_zone.name]['forwarders_dict'].values() %}
+{% for forwarder in bind_zone_auxiliary[bind_zone.name]['forwarders_dict'].values() %}
 {% set forwarder_string = forwarder.ip %}
 {% if forwarder.port is defined %}
 {% set forwarder_string = forwarder_string + ' port ' + forwarder.port | string %}
@@ -139,9 +139,9 @@ include "{{ bind_tsig_file }}";
 {% endfor %}
 {% endif %}
 {# Build also-notify #}
-{% if zone_auxiliary[bind_zone.name] is defined and zone_auxiliary[bind_zone.name]['also_notify_dict'] is defined%}
+{% if bind_zone_auxiliary[bind_zone.name] is defined and bind_zone_auxiliary[bind_zone.name]['also_notify_dict'] is defined%}
 {% set _also_notify = [] %}
-{% for also_notify in zone_auxiliary[bind_zone.name]['also_notify_dict'].values() %}
+{% for also_notify in bind_zone_auxiliary[bind_zone.name]['also_notify_dict'].values() %}
 {% set also_notify_string = also_notify.ip %}
 {% if also_notify.port is defined %}
 {% set also_notify_string = also_notify_string + ' port ' + also_notify.port | string %}
@@ -157,9 +157,9 @@ include "{{ bind_tsig_file }}";
 {% set _type = 'secondary' %}
 {% elif bind_zone.type is defined and bind_zone.type == 'forward' %}
 {% set _type = 'forward' %}
-{% elif bind_zone.type is not defined and bind_zone.primaries is defined and (host_all_addresses|intersect(zone_auxiliary[bind_zone.name]['primaries_dict'])|length > 0) %}
+{% elif bind_zone.type is not defined and bind_zone.primaries is defined and (host_all_addresses|intersect(bind_zone_auxiliary[bind_zone.name]['primaries_dict'])|length > 0) %}
 {% set _type = 'primary' %}
-{% elif bind_zone.type is not defined and bind_zone.primaries is defined and not (host_all_addresses|intersect(zone_auxiliary[bind_zone.name]['primaries_dict'])|length > 0) %}
+{% elif bind_zone.type is not defined and bind_zone.primaries is defined and not (host_all_addresses|intersect(bind_zone_auxiliary[bind_zone.name]['primaries_dict'])|length > 0) %}
 {% set _type = 'secondary' %}
 {% elif bind_zone.type is not defined and bind_zone.forwarders is defined %}
 {% set _type = 'forward' %}
@@ -168,7 +168,7 @@ include "{{ bind_tsig_file }}";
 
 {# Start: set mapped primaries for the zone #}
 {% if bind_key_mapping | length != 0 %}
-{% set _mapped_zone_primaries = bind_key_mapping.keys() | intersect(zone_auxiliary[bind_zone.name]['primaries_dict']) %}
+{% set _mapped_zone_primaries = bind_key_mapping.keys() | intersect(bind_zone_auxiliary[bind_zone.name]['primaries_dict']) %}
 {% else %}
 {% set _mapped_zone_primaries = [] %}
 {% endif %}
