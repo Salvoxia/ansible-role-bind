@@ -97,3 +97,6 @@ bind_log: "data/named.run"
 
 # Global option max-cache-size
 bind_max_cache_size: ""
+
+# Flag indicating whether to start / reload BIND (if false, only the configuration will be created/updated)
+bind_manage_service: true

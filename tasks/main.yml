@@ -28,7 +28,9 @@
     update_cache: true
   become: true
   changed_when: false
-  when: ansible_os_family == 'Debian'
+  when:
+    - bind_manage_service
+    - ansible_os_family == 'Debian'
   tags: bind
 
 - name: Assert that all XFR keys exist in the key list
@@ -42,9 +44,23 @@
     pkg: "{{ item }}"
     state: present
   become: true
+  when: bind_manage_service
   with_items:
     - "{{ bind_packages }}"
   tags: bind
+
+- name: Ensure bind_group exists
+  ansible.builtin.group:
+    name: "{{ bind_group }}"
+    state: present
+  when: not bind_manage_service
+
+- name: Ensure bind_owner exists
+  ansible.builtin.user:
+    name: "{{ bind_owner }}"
+    group: "{{ bind_group }}"
+    state: present
+  when: not bind_manage_service
 
 - name: Ensure runtime directories referenced in config exist
   ansible.builtin.file:
@@ -103,7 +119,11 @@
     host_all_addresses: "{{ [ipify_public_ip] | union(ansible_all_ipv4_addresses | union(ansible_all_ipv6_addresses)) }}"
   tags: bind
 
-- name: Build auxiliary zone dictionary (creates fact zone_auxiliary)
+- name: Initialize bind_zone_auxiliary
+  ansible.builtin.set_fact:
+    bind_zone_auxiliary: {}
+
+- name: Build auxiliary zone dictionary (creates fact bind_zone_auxiliary)
   ansible.builtin.include_tasks: "build_host_dicts.yml"
   loop: '{{ bind_zones }}'
   loop_control:
@@ -116,10 +136,11 @@
   failed_when: false
   changed_when: false
   when: >-
-    ((item.type is defined and item.type == 'primary') or
-    (item.type is not defined and zone_auxiliary[item.name]['primaries_dict'] is defined and
-    (host_all_addresses | intersect(zone_auxiliary[item.name]['primaries_dict'].keys()) | length > 0))) and
-    (ansible_facts.services[bind_service].state == "running") and (item.allow_update | default(false))
+    bind_manage_service and
+    (((item.type is defined and item.type == 'primary') or
+    (item.type is not defined and bind_zone_auxiliary[item.name]['primaries_dict'] is defined and
+    (host_all_addresses | intersect(bind_zone_auxiliary[item.name]['primaries_dict'].keys()) | length > 0))) and
+    (ansible_facts.services[bind_service].state == "running") and (item.allow_update | default(false)))
   with_items: '{{ bind_zones }}'
   tags: bind
 
@@ -140,7 +161,23 @@
   ansible.builtin.include_tasks: "zones.yml"
   tags: bind
 
-- name: Main BIND config file
+- name: Check if named-checkconf is available
+  ansible.builtin.command:
+    which named-checkconf
+  register: check_named
+  failed_when: check_named.rc not in [0,1]
+  changed_when: false
+
+- name: Ensure bind_conf_dir exists
+  ansible.builtin.file:
+    path: "{{ bind_conf_dir }}"
+    owner: "root"
+    group: "{{ bind_group }}"
+    mode: "02745"
+    state: directory
+  when: not bind_manage_service
+
+- name: Main BIND config file (with validation)
   ansible.builtin.template:
     src: etc_named.conf.j2
     dest: "{{ bind_config }}"
@@ -151,6 +188,20 @@
     validate: 'named-checkconf %s'
   become: true
   notify: Reload bind
+  when: check_named.rc == 0
+  tags: bind
+
+- name: Main BIND config file (without validation)
+  ansible.builtin.template:
+    src: etc_named.conf.j2
+    dest: "{{ bind_config }}"
+    owner: "{{ bind_owner }}"
+    group: "{{ bind_group }}"
+    mode: "0640"
+    setype: named_conf_t
+  become: true
+  notify: Reload bind
+  when: check_named.rc != 0
   tags: bind
 
 - name: Start BIND service
@@ -160,12 +211,14 @@
     enabled: true
   become: true
   tags: bind
+  when: bind_manage_service
 
 - name: Flush handlers to reload BIND
   ansible.builtin.meta: flush_handlers
 
 - name: Synchronize dynamic zones
   ansible.builtin.include_tasks: "sync_dynamic_zones.yml"
+  when: bind_manage_service
 
 - name: Thaw dynamic zones
   ansible.builtin.command:
@@ -173,9 +226,10 @@
   become: true
   changed_when: false
   when: >-
-    ((item.type is defined and item.type == 'primary') or
-    (item.type is not defined and zone_auxiliary[item.name]['primaries_dict'] is defined and
-    (host_all_addresses | intersect(zone_auxiliary[item.name]['primaries_dict'].keys()) | length > 0))) and
-    (ansible_facts.services[bind_service].state == "running") and (item.allow_update | default(false))
+    bind_manage_service and
+    (((item.type is defined and item.type == 'primary') or
+    (item.type is not defined and bind_zone_auxiliary[item.name]['primaries_dict'] is defined and
+    (host_all_addresses | intersect(bind_zone_auxiliary[item.name]['primaries_dict'].keys()) | length > 0))) and
+    (ansible_facts.services[bind_service].state == "running") and (item.allow_update | default(false)))
   with_items: '{{ bind_zones }}'
   tags: bind

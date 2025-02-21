@@ -4,13 +4,13 @@
   block:
     - name: Convert primaries with port
       ansible.builtin.set_fact:
-        zone_auxiliary: "{{ zone_auxiliary | default({}) | combine({zone.name: {'primaries_dict': {item.ip: {'ip': item.ip, 'port': item.port | string}}}}, recursive=True) }}"
-      when: item.port is defined
+        bind_zone_auxiliary: "{{ bind_zone_auxiliary | default({}) | combine({zone.name: {'primaries_dict': {item.ip: {'ip': item.ip, 'port': item.port | string}}}}, recursive=True) }}"
+      when: item.ip is defined
       with_items: "{{ zone.primaries }}"
 
     - name: Convert primaries without port
       ansible.builtin.set_fact:
-        zone_auxiliary: "{{ zone_auxiliary | default({}) | combine({zone.name: {'primaries_dict': {item: {'ip': item}}}}, recursive=True) }}"
+        bind_zone_auxiliary: "{{ bind_zone_auxiliary | default({}) | combine({zone.name: {'primaries_dict': {item: {'ip': item}}}}, recursive=True) }}"
       when: item.port is not defined
       with_items: "{{ zone.primaries }}"
 
@@ -19,13 +19,13 @@
   block:
     - name: Convert also_notify with port
       ansible.builtin.set_fact:
-        zone_auxiliary: "{{ zone_auxiliary | default({}) | combine({zone.name: {'also_notify_dict': {item.ip: {'ip': item.ip, 'port': item.port | string}}}}, recursive=True) }}"
+        bind_zone_auxiliary: "{{ bind_zone_auxiliary | default({}) | combine({zone.name: {'also_notify_dict': {item.ip: {'ip': item.ip, 'port': item.port | string}}}}, recursive=True) }}"
       when: item.port is defined
       with_items: "{{ zone.also_notify }}"
 
     - name: Convert also_notify without port
       ansible.builtin.set_fact:
-        zone_auxiliary: "{{ zone_auxiliary | default({}) | combine({zone.name: {'also_notify_dict': {item: {'ip': item}}}}, recursive=True) }}"
+        bind_zone_auxiliary: "{{ bind_zone_auxiliary | default({}) | combine({zone.name: {'also_notify_dict': {item: {'ip': item}}}}, recursive=True) }}"
       when: item.port is not defined
       with_items: "{{ zone.also_notify }}"
 
@@ -34,12 +34,12 @@
   block:
     - name: Convert forwarders with port
       ansible.builtin.set_fact:
-        zone_auxiliary: "{{ zone_auxiliary | default({}) | combine({zone.name: {'forwarders_dict': {item.ip: {'ip': item.ip, 'port': item.port | string}}}}, recursive=True) }}"
+        bind_zone_auxiliary: "{{ bind_zone_auxiliary | default({}) | combine({zone.name: {'forwarders_dict': {item.ip: {'ip': item.ip, 'port': item.port | string}}}}, recursive=True) }}"
       when: item.port is defined
       with_items: "{{ zone.forwarders }}"
 
     - name: Convert forwarders without port
       ansible.builtin.set_fact:
-        zone_auxiliary: "{{ zone_auxiliary | default({}) | combine({zone.name: {'forwarders_dict': {item: {'ip': item}}}}, recursive=True) }}"
+        bind_zone_auxiliary: "{{ bind_zone_auxiliary | default({}) | combine({zone.name: {'forwarders_dict': {item: {'ip': item}}}}, recursive=True) }}"
       when: item.port is not defined
       with_items: "{{ zone.forwarders }}"
