@@ -49,11 +49,6 @@
           - bind_config_check.stat is defined
           - not bind_config_check.stat.isdir
 
-    - debug:
-        var: ansible_all_ipv4_addresses
-
-    - debug:
-        var: item.primaries
       with_items: "{{ bind_zones }}"
     - name: Detect whether host is a primary
       ansible.builtin.set_fact:
