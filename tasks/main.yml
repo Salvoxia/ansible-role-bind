@@ -61,7 +61,9 @@
     group: "{{ bind_group }}"
     create_home: false
     state: present
-  when: not bind_manage_service
+  when: 
+    - bind_owner != 'root'
+    - not bind_manage_service
 
 - name: Ensure runtime directories referenced in config exist
   ansible.builtin.file:
