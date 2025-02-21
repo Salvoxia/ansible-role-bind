@@ -61,7 +61,7 @@
     group: "{{ bind_group }}"
     create_home: false
     state: present
-  when: 
+  when:
     - bind_owner != 'root'
     - not bind_manage_service
 
