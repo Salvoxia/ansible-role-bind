@@ -59,6 +59,7 @@
   ansible.builtin.user:
     name: "{{ bind_owner }}"
     group: "{{ bind_group }}"
+    create_home: false
     state: present
   when: not bind_manage_service
 
