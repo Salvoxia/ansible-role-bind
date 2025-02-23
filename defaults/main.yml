@@ -100,3 +100,6 @@ bind_max_cache_size: ""
 
 # Flag indicating whether to start / reload BIND (if false, only the configuration will be created/updated)
 bind_manage_service: true
+
+# Setting for reverse lookup zone file format, either 'text' or 'raw'
+bind_reverse_lookup_zone_masterfile_format: "text"

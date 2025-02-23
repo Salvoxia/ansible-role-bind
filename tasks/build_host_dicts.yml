@@ -43,3 +43,15 @@
         bind_zone_auxiliary: "{{ bind_zone_auxiliary | default({}) | combine({zone.name: {'forwarders_dict': {item: {'ip': item}}}}, recursive=True) }}"
       when: item.port is not defined
       with_items: "{{ zone.forwarders }}"
+
+- name: Set masterfile_format for text
+  ansible.builtin.set_fact:
+    bind_zone_auxiliary: "{{ bind_zone_auxiliary | default({}) | combine({zone.name: {'masterfile_format': 'text'}}, recursive=True) }}"
+  when: item.masterfile_format is not defined or item.masterfile_format == 'text'
+
+- name: Set masterfile_format for raw
+  ansible.builtin.set_fact:
+    bind_zone_auxiliary: "{{ bind_zone_auxiliary | default({}) | combine({zone.name: {'masterfile_format': 'raw'}}, recursive=True) }}"
+  when:
+    - item.masterfile_format is defined
+    - item.masterfile_format == 'raw'
