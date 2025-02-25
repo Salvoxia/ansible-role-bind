@@ -102,4 +102,4 @@ bind_max_cache_size: ""
 bind_manage_service: true
 
 # Setting for reverse lookup zone file format, either 'text' or 'raw'
-bind_reverse_lookup_zone_masterfile_format: "text"
+bind_reverse_lookup_zone_masterfile_format: ""

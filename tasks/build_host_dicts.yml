@@ -1,6 +1,7 @@
 ---
 - name: Build primaries dict
   when: zone.primaries is defined
+  tags: bind
   block:
     - name: Convert primaries with port
       ansible.builtin.set_fact:
@@ -16,6 +17,7 @@
 
 - name: Build also_notify dict
   when: zone.also_notify is defined
+  tags: bind
   block:
     - name: Convert also_notify with port
       ansible.builtin.set_fact:
@@ -31,6 +33,7 @@
 
 - name: Build zone forwarders dict
   when: zone.forwarders is defined
+  tags: bind
   block:
     - name: Convert forwarders with port
       ansible.builtin.set_fact:
@@ -47,11 +50,13 @@
 - name: Set masterfile_format for text
   ansible.builtin.set_fact:
     bind_zone_auxiliary: "{{ bind_zone_auxiliary | default({}) | combine({zone.name: {'masterfile_format': 'text'}}, recursive=True) }}"
-  when: item.masterfile_format is not defined or item.masterfile_format == 'text'
+  when: zone.masterfile_format is not defined or zone.masterfile_format == 'text'
+  tags: bind
 
 - name: Set masterfile_format for raw
   ansible.builtin.set_fact:
     bind_zone_auxiliary: "{{ bind_zone_auxiliary | default({}) | combine({zone.name: {'masterfile_format': 'raw'}}, recursive=True) }}"
   when:
-    - item.masterfile_format is defined
-    - item.masterfile_format == 'raw'
+    - zone.masterfile_format is defined
+    - zone.masterfile_format == 'raw'
+  tags: bind

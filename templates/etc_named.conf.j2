@@ -175,6 +175,9 @@ include "{{ bind_tsig_file }}";
 {# End: set mapped primaries for the zone #}
 {# {{ _mapped_zone_primaries }} #}
 zone "{{ bind_zone.name }}" IN {
+{% if bind_zone.masterfile_format is defined %}
+  masterfile-format {{ bind_zone.masterfile_format }};
+{% endif %}
 {% if _type == 'primary' %}
   type master;
   file "{{ bind_zone_dir }}/{{ bind_zone.name }}";
@@ -233,6 +236,9 @@ zone "{{ bind_zone.name }}" IN {
 {% for network in bind_zone.networks %}
 
 zone "{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa" IN {
+{% if bind_reverse_lookup_zone_masterfile_format | length > 0 %}
+  masterfile-format {{ bind_reverse_lookup_zone_masterfile_format }};
+{% endif %}
 {% if _type == 'primary' %}
   type master;
   file "{{ bind_zone_dir }}/{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa";
@@ -292,6 +298,9 @@ zone "{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr
 {% for network in bind_zone.ipv6_networks %}
 
 zone "{{ (network | ansible.utils.ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):] }}" IN {
+{% if bind_reverse_lookup_zone_masterfile_format | length > 0 %}
+  masterfile-format {{ bind_reverse_lookup_zone_masterfile_format }};
+{% endif %}
 {% if _type == 'primary' %}
   type master;
   file "{{ bind_zone_dir }}/{{ (network | ansible.utils.ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):-1] }}";
