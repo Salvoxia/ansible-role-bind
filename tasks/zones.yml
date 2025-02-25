@@ -1,6 +1,6 @@
 ---
 - name: Read forward zone hashes
-  ansible.builtin.shell: 'grep -s "^; Hash:" {{ bind_zone_dir }}/{{ item.name }} || true'
+  ansible.builtin.shell: "grep -s \"^; Hash:\" {{ bind_zone_dir }}/{{ item.name }}{{'.text' if bind_zone_auxiliary[item.name]['masterfile_format'] == 'raw' }} || true"
   changed_when: false
   check_mode: false
   register: forward_hashes_temp
@@ -22,7 +22,8 @@
   tags: bind
 
 - name: Read reverse ipv4 zone hashes
-  ansible.builtin.shell: "grep -s \"^; Hash:\" {{ bind_zone_dir }}/{{ ('.'.join(item.1.replace(item.1+'.','').split('.')[::-1])) }}.in-addr.arpa || true"
+  ansible.builtin.shell: "grep -s \"^; Hash:\" {{ bind_zone_dir }}/{{ ('.'.join(item.1.replace(item.1+'.','').split('.')[::-1])) }}.in-addr.arpa\
+                          {{'.text' if bind_reverse_lookup_zone_masterfile_format == 'raw' }} || true"
   changed_when: false
   check_mode: false
   register: reverse_hashes_temp
@@ -48,7 +49,8 @@
   tags: bind
 
 - name: Read reverse ipv6 zone hashes
-  ansible.builtin.shell: "grep -s \"^; Hash:\" {{ bind_zone_dir }}/{{ (item.1 | ansible.utils.ipaddr('revdns'))[-(9+(item.1|regex_replace('^.*/','')|int)//2):-1] }} || true"
+  ansible.builtin.shell: "grep -s \"^; Hash:\" {{ bind_zone_dir }}/{{ (item.1 | ansible.utils.ipaddr('revdns'))[-(9+(item.1|regex_replace('^.*/','')|int)//2):-1] }}\
+                          {{ '.text' if bind_reverse_lookup_zone_masterfile_format == 'raw' }} || true"
   changed_when: false
   check_mode: false
   register: reverse_hashes_ipv6_temp
@@ -79,14 +81,15 @@
   register: check_named
   failed_when: check_named.rc not in [0,1]
   changed_when: false
+  tags: bind
 
 - name: Create lookup zone files (with validation)
   when: check_named.rc == 0
   block:
-    - name: Create forward lookup zone file
+    - name: Create forward lookup zone file (with validation)
       ansible.builtin.template:
         src: bind_zone.j2
-        dest: "{{ bind_zone_dir }}/{{ item.name }}"
+        dest: "{{ bind_zone_dir }}/{{ item.name }}{{'.text' if bind_zone_auxiliary[item.name].masterfile_format == 'raw' }}"
         owner: "{{ bind_owner }}"
         group: "{{ bind_group }}"
         mode: "{{ bind_zone_file_mode }}"
@@ -103,12 +106,13 @@
         (item.type is not defined and bind_zone_auxiliary[item.name]['primaries_dict'] is defined and
         (host_all_addresses | intersect(bind_zone_auxiliary[item.name]['primaries_dict'].keys()) | length > 0)))
       notify: Reload bind
+      register: bind_zone_file_creation_result
       tags: bind
 
-    - name: Create reverse lookup zone file
+    - name: Create reverse lookup zone file (with validation)
       ansible.builtin.template:
         src: reverse_zone.j2
-        dest: "{{ bind_zone_dir }}/{{ ('.'.join(item.1.replace(item.1+'.','').split('.')[::-1])) }}.in-addr.arpa"
+        dest: "{{ bind_zone_dir }}/{{ ('.'.join(item.1.replace(item.1+'.','').split('.')[::-1])) }}.in-addr.arpa{{'.text' if bind_reverse_lookup_zone_masterfile_format == 'raw' }}"
         owner: "{{ bind_owner }}"
         group: "{{ bind_group }}"
         mode: "{{ bind_zone_file_mode }}"
@@ -128,12 +132,14 @@
         (item[0].type is not defined and bind_zone_auxiliary[item[0].name]['primaries_dict'] is defined and
         (host_all_addresses | intersect(bind_zone_auxiliary[item[0].name]['primaries_dict'].keys()) | length > 0)))
       notify: Reload bind
+      register: bind_reverse_lookup_file_creation_result
       tags: bind
 
-    - name: Create reverse IPv6 lookup zone file
+    - name: Create reverse IPv6 lookup zone file (with validation)
       ansible.builtin.template:
         src: reverse_zone_ipv6.j2
-        dest: "{{ bind_zone_dir }}/{{ (item.1 | ansible.utils.ipaddr('revdns'))[-(9+(item.1|regex_replace('^.*/','')|int)//2):-1] }}"
+        dest: "{{ bind_zone_dir }}/{{ (item.1 | ansible.utils.ipaddr('revdns'))[-(9+(item.1|regex_replace('^.*/','')|int)//2):-1] }}\
+              {{ '.text' if bind_reverse_lookup_zone_masterfile_format == 'raw' }}"
         owner: "{{ bind_owner }}"
         group: "{{ bind_group }}"
         mode: "{{ bind_zone_file_mode }}"
@@ -153,15 +159,16 @@
         (item[0].type is not defined and bind_zone_auxiliary[item[0].name]['primaries_dict'] is defined and
         (host_all_addresses | intersect(bind_zone_auxiliary[item[0].name]['primaries_dict'].keys()) | length > 0)))
       notify: Reload bind
+      register: bind_ipv6_reverse_lookup_file_creation_result
       tags: bind
 
 - name: Create lookup zone files (without validation)
-  when: check_named.rc == 0
+  when: check_named.rc == 1
   block:
-    - name: Create forward lookup zone file
+    - name: Create forward lookup zone file (without validation)
       ansible.builtin.template:
         src: bind_zone.j2
-        dest: "{{ bind_zone_dir }}/{{ item.name }}"
+        dest: "{{ bind_zone_dir }}/{{ item.name }}{{'.text' if bind_reverse_lookup_zone_masterfile_format == 'raw' }}"
         owner: "{{ bind_owner }}"
         group: "{{ bind_group }}"
         mode: "{{ bind_zone_file_mode }}"
@@ -176,12 +183,13 @@
         ((item.type is defined and item.type == 'primary') or
         (item.type is not defined and bind_zone_auxiliary[item.name]['primaries_dict'] is defined and
         (host_all_addresses | intersect(bind_zone_auxiliary[item.name]['primaries_dict'].keys()) | length > 0)))
+      register: bind_zone_file_creation_result_no_validation
       tags: bind
 
-    - name: Create reverse lookup zone file
+    - name: Create reverse lookup zone file (without validation)
       ansible.builtin.template:
         src: reverse_zone.j2
-        dest: "{{ bind_zone_dir }}/{{ ('.'.join(item.1.replace(item.1+'.','').split('.')[::-1])) }}.in-addr.arpa"
+        dest: "{{ bind_zone_dir }}/{{ ('.'.join(item.1.replace(item.1+'.','').split('.')[::-1])) }}.in-addr.arpa{{'.text' if bind_reverse_lookup_zone_masterfile_format == 'raw' }}"
         owner: "{{ bind_owner }}"
         group: "{{ bind_group }}"
         mode: "{{ bind_zone_file_mode }}"
@@ -199,12 +207,14 @@
         ((item[0].type is defined and item[0].type == 'primary') or
         (item[0].type is not defined and bind_zone_auxiliary[item[0].name]['primaries_dict'] is defined and
         (host_all_addresses | intersect(bind_zone_auxiliary[item[0].name]['primaries_dict'].keys()) | length > 0)))
+      register: bind_reverse_lookup_file_creation_result_no_validation
       tags: bind
 
-    - name: Create reverse IPv6 lookup zone file
+    - name: Create reverse IPv6 lookup zone file (without validation)
       ansible.builtin.template:
         src: reverse_zone_ipv6.j2
-        dest: "{{ bind_zone_dir }}/{{ (item.1 | ansible.utils.ipaddr('revdns'))[-(9+(item.1|regex_replace('^.*/','')|int)//2):-1] }}"
+        dest: "{{ bind_zone_dir }}/{{ (item.1 | ansible.utils.ipaddr('revdns'))[-(9+(item.1|regex_replace('^.*/','')|int)//2):-1] }}\
+                {{ '.text' if bind_reverse_lookup_zone_masterfile_format == 'raw' }}"
         owner: "{{ bind_owner }}"
         group: "{{ bind_group }}"
         mode: "{{ bind_zone_file_mode }}"
@@ -222,4 +232,49 @@
         ((item[0].type is defined and item[0].type == 'primary') or
         (item[0].type is not defined and bind_zone_auxiliary[item[0].name]['primaries_dict'] is defined and
         (host_all_addresses | intersect(bind_zone_auxiliary[item[0].name]['primaries_dict'].keys()) | length > 0)))
+      register: bind_ipv6_reverse_lookup_file_creation_result_no_validation
       tags: bind
+
+- name: Check if named-compilezone is available
+  ansible.builtin.command:
+    which named-compilezone
+  register: check_named
+  failed_when: check_named.rc not in [0,1]
+  changed_when: false
+  tags: bind
+
+- name: Compile zone files (if raw format)
+  when: check_named.rc == 0
+  tags: bind
+  block:
+    - name: Compile forward lookup zone files
+      ansible.builtin.command: "named-compilezone -f text -F raw -o {{ bind_zone_dir }}/{{ zone_file.item.name }} {{ zone_file.item.name }} {{ zone_file.dest }}"
+      when:
+        - zone_file.changed
+        - bind_zone_auxiliary[zone_file.item.name].masterfile_format == 'raw'
+      changed_when: zone_file.changed
+      with_items: "{{ bind_zone_file_creation_result.results + bind_zone_file_creation_result_no_validation.results }}"
+      loop_control:
+        loop_var: zone_file
+
+    - name: Compile reverse lookup zone files
+      ansible.builtin.command: "named-compilezone -f text -F raw -o {{ zone_file.dest | regex_replace('^(.*)\\.text$', '\\1') }}
+                              {{ zone_file.dest | regex_search('([^\/]+(?=\/$|\\.text$))', '\\1') | first }} {{ zone_file.dest }}"
+      when:
+        - zone_file.changed
+        - bind_reverse_lookup_zone_masterfile_format == 'raw'
+      changed_when: zone_file.changed
+      with_items: "{{ bind_reverse_lookup_file_creation_result.results + bind_reverse_lookup_file_creation_result_no_validation.results }}"
+      loop_control:
+        loop_var: zone_file
+
+    - name: Compile IPv6 reverse lookup zone files
+      ansible.builtin.command: "named-compilezone -f text -F raw -o {{ zone_file.dest | regex_replace('^(.*)\\.text$', '\\1') }}
+                              {{ zone_file.dest | regex_search('([^\/]+(?=\/$|\\.text$))', '\\1') | first }} {{ zone_file.dest }}"
+      when:
+        - zone_file.changed
+        - bind_reverse_lookup_zone_masterfile_format == 'raw'
+      changed_when: zone_file.changed
+      with_items: "{{ bind_ipv6_reverse_lookup_file_creation_result.results + bind_ipv6_reverse_lookup_file_creation_result_no_validation.results }}"
+      loop_control:
+        loop_var: zone_file

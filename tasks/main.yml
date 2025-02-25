@@ -98,6 +98,15 @@
   check_mode: false
   tags: bind
 
+- name: Ensure bind_conf_dir exists
+  ansible.builtin.file:
+    path: "{{ bind_conf_dir }}"
+    owner: "root"
+    group: "{{ bind_group }}"
+    mode: "02745"
+    state: directory
+  when: not bind_manage_service
+
 # file to set keys for XFR authentication
 - name: Create extra config for authenticated XFR request
   ansible.builtin.template:
@@ -170,15 +179,6 @@
   register: check_named
   failed_when: check_named.rc not in [0,1]
   changed_when: false
-
-- name: Ensure bind_conf_dir exists
-  ansible.builtin.file:
-    path: "{{ bind_conf_dir }}"
-    owner: "root"
-    group: "{{ bind_group }}"
-    mode: "02745"
-    state: directory
-  when: not bind_manage_service
 
 - name: Main BIND config file (with validation)
   ansible.builtin.template:

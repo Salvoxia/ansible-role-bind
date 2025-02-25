@@ -36,66 +36,68 @@ The packages `python-netaddr` (required for the [`ansible.utils.ipaddr`](https:/
 
 ## Role Variables
 
-| Variable                    | Default              | Comments (type)                                                                                                                      |
-| :-------------------------- | :------------------- | :----------------------------------------------------------------------------------------------------------------------------------- |
-| `bind_manage_service`       | `true`               | Indicating whether to install, start and enable bind. If set to `false`, only the configuration is generated (but not verified).     |
-| `bind_acls`                 | `[]`                 | A list of ACL definitions, which are mappings with keys `name:` and `match_list:`. See below for an example.                         |
-| `bind_allow_query`          | `['localhost']`      | A list of hosts that are allowed to query this DNS server. Set to ['any'] to allow all hosts                                         |
-| `bind_allow_recursion`      | `['any']`            | Similar to `bind_allow_query`, this option applies to recursive queries.                                                             |
-| `bind_allow_transfer`       | `[]`                 | A list of hosts that allowed to transfer (copy) the zone information from the server                                                 |
-| `bind_check_names`          | `[]`                 | Check host names for compliance with RFC 952 and RFC 1123 and take the defined action (e.g. `warn`, `ignore`, `fail`).               |
-| `bind_dns_keys`             | `[]`                 | A list of binding keys, which are mappings with keys `name:` `algorithm:` and `secret:`. See below for an example.                   |
-| `bind_tsig_keys`            | `[]`                 | A list of tsig keys, which are mappings with keys `name:` `algorithm:` and `secret:`. See below for an example.                      |
-| `bind_dns64`                | `false`              | If `true`, support for [DNS64](https://www.oreilly.com/library/view/dns-and-bind/9781449308025/ch04.html) is enabled                 |
-| `bind_dns64_clients`        | `['any']`            | A list of clients which the DNS64 function applies to (can be any ACL)                                                               |
-| `bind_dnssec_enable`        | `true`               | If `true`, DNSSEC is enabled                                                                                                         |
-| `bind_dnssec_validation`    | `true`               | If `true`, DNSSEC validation is enabled                                                                                              |
-| `bind_extra_include_files`  | `[]`                 | A list of custom config files to be included from the main config file                                                               |
-| `bind_forward_only`         | `false`              | If `true`, BIND is set up as a caching name server                                                                                   |
-| `bind_forwarders`           | `[]`                 | A list of name servers to forward DNS requests to.                                                                                   |
-| `bind_listen_ipv4`          | `['127.0.0.1']`      | A list of the IPv4 address of the network interface(s) to listen on. Set to ['any'] to listen on all interfaces.                     |
-| `bind_listen_ipv4_port`     | `[53]`               | A list of port numbers to listen on for IPv4 addresses.                                                                              |
-| `bind_listen_ipv6`          | `['::1']`            | A list of the IPv6 address of the network interface(s) to listen on                                                                  |
-| `bind_listen_ipv6_port`     | `[53]`               | A list of port numbers to listen on for IPv6 addresses.                                                                              |
-| `bind_log`                  | `data/named.run`     | Path to the log file                                                                                                                 |
-| `bind_other_logs`           | -                    | A list of logging channels to configure, with a separate mapping for each zone, with relevant details                                |
-| `bind_query_log`            | -                    | A mapping with keyss `file:` (e.g. `data/query.log`), `versions:`, `size:`. When defined, this will enable the query log             |
-| `bind_recursion`            | `false`              | Determines whether requests for which the DNS server is not authoritative should be forwarded†.                                      |
-| `bind_rrset_order`          | `random`             | Defines order for DNS round robin (either `random` or `cyclic`)                                                                      |
-| `bind_statistics_channels`  | `false`              | If `true`, BIND is configured with a `statistics-channels` clause (currently only supports listening on a single interface)          |
-| `bind_statistics_allow`     | `['127.0.0.1']`      | A list of hosts that can access the server statistics                                                                                |
-| `bind_statistics_host`      | `127.0.0.1`          | IP address of the network interface that the statistics service should listen on                                                     |
-| `bind_statistics_port`      | 8053                 | Network port that the statistics service should listen on                                                                            |
-| `bind_zone_dir`             | -                    | When defined, sets a custom absolute path to the server directory (for zone files, etc.) instead of the default.                     |
-| `bind_key_mapping`          | []                   | `Primary: Keyname` - mapping of TSIG keys to use for a specific primary                                                              |
-| `bind_zones`                | n/a                  | A list of mappings with zone definitions. See below this table for examples                                                          |
-| `- allow_update`            | `['none']`           | A list of hosts that are allowed to dynamically update this DNS zone.                                                                |
-| `- also_notify`             | -                    | A list of servers that will receive a notification when the primary zone file is reloaded.                                           |
-| `- create_forward_zones`    | -                    | When initialized and set to `false`, creation of forward zones will be skipped (resulting in a reverse only zone)                    |
-| `- create_reverse_zones`    | -                    | When initialized and set to `false`, creation of reverse zones will be skipped (resulting in a forward only zone)                    |
-| `- delegate`                | `[]`                 | Zone delegation.                                                                                                                     |
-| `- forwarders`              | -                    | List of forwarders for for the forward type zone                                                                                     |
-| `- hostmaster_email`        | `hostmaster`         | The e-mail address of the system administrator for the zone                                                                          |
-| `- hosts`                   | `[]`                 | Host definitions.                                                                                                                    |
-| `- ipv6_networks`           | `[]`                 | A list of the IPv6 networks that are part of the domain, in CIDR notation (e.g. 2001:db8::/48)                                       |
-| `- mail_servers`            | `[]`                 | A list of mappings (with keys `name:` and `preference:`) specifying the mail servers for this domain.                                |
-| `- name_servers`            | `[ansible_hostname]` | A list of the DNS servers for this domain.                                                                                           |
-| `- name`                    | `example.com`        | The domain name                                                                                                                      |
-| `- naptr`                   | `[]`                 | A list of mappings with keys `name:`, `order:`, `pref:`, `flags:`, `service:`, `regex:` and `replacement:` specifying NAPTR records. |
-| `- networks`                | `['10.0.2']`         | A list of the networks that are part of the domain                                                                                   |
-| `- other_name_servers`      | `[]`                 | A list of the DNS servers outside of this domain.                                                                                    |
-| `- primaries`               | -                    | A list of primary DNS servers for this zone.                                                                                         |
-| `- services`                | `[]`                 | A list of services to be advertised by SRV records                                                                                   |
-| `- text`                    | `[]`                 | A list of mappings with keys `name:` and `text:`, specifying TXT records. `text:` can be a list or string.                           |
-| `- caa`                     | `[]`                 | A list of mappings with keys `name:` and `text:`, specifying CAA records. `text:` can be a list or string.                           |
-| `- type`                    | -                    | Optional zone type. If not specified, autodetection will be used. Possible values include `primary`, `secondary` or `forward`        |
-| `bind_zone_file_mode`       | 0640                 | The file permissions for the main config file (named.conf)                                                                           |
-| `bind_zone_minimum_ttl`     | `1D`                 | Minimum TTL field in the SOA record.                                                                                                 |
-| `bind_zone_time_to_expire`  | `1W`                 | Time to expire field in the SOA record.                                                                                              |
-| `bind_zone_time_to_refresh` | `1D`                 | Time to refresh field in the SOA record.                                                                                             |
-| `bind_zone_time_to_retry`   | `1H`                 | Time to retry field in the SOA record.                                                                                               |
-| `bind_zone_ttl`             | `1W`                 | Time to Live field in the SOA record.                                                                                                |
-| `bind_python_version`       | -                    | The python version that should be used for ansible. Depends on Distro, either `2` or `3`. Defaults to the OS standard                |
+| Variable                                           | Default              | Comments (type)                                                                                                                      |
+| :------------------------------------------------- | :------------------- | :----------------------------------------------------------------------------------------------------------------------------------- |
+| `bind_manage_service`                              | `true`               | Indicating whether to install, start and enable bind. If set to `false`, only the configuration is generated (but not verified).     |
+| `bind_acls`                                        | `[]`                 | A list of ACL definitions, which are mappings with keys `name:` and `match_list:`. See below for an example.                         |
+| `bind_allow_query`                                 | `['localhost']`      | A list of hosts that are allowed to query this DNS server. Set to ['any'] to allow all hosts                                         |
+| `bind_allow_recursion`                             | `['any']`            | Similar to `bind_allow_query`, this option applies to recursive queries.                                                             |
+| `bind_allow_transfer`                              | `[]`                 | A list of hosts that allowed to transfer (copy) the zone information from the server                                                 |
+| `bind_check_names`                                 | `[]`                 | Check host names for compliance with RFC 952 and RFC 1123 and take the defined action (e.g. `warn`, `ignore`, `fail`).               |
+| `bind_dns_keys`                                    | `[]`                 | A list of binding keys, which are mappings with keys `name:` `algorithm:` and `secret:`. See below for an example.                   |
+| `bind_tsig_keys`                                   | `[]`                 | A list of tsig keys, which are mappings with keys `name:` `algorithm:` and `secret:`. See below for an example.                      |
+| `bind_dns64`                                       | `false`              | If `true`, support for [DNS64](https://www.oreilly.com/library/view/dns-and-bind/9781449308025/ch04.html) is enabled                 |
+| `bind_dns64_clients`                               | `['any']`            | A list of clients which the DNS64 function applies to (can be any ACL)                                                               |
+| `bind_dnssec_enable`                               | `true`               | If `true`, DNSSEC is enabled                                                                                                         |
+| `bind_dnssec_validation`                           | `true`               | If `true`, DNSSEC validation is enabled                                                                                              |
+| `bind_extra_include_files`                         | `[]`                 | A list of custom config files to be included from the main config file                                                               |
+| `bind_forward_only`                                | `false`              | If `true`, BIND is set up as a caching name server                                                                                   |
+| `bind_forwarders`                                  | `[]`                 | A list of name servers to forward DNS requests to.                                                                                   |
+| `bind_listen_ipv4`                                 | `['127.0.0.1']`      | A list of the IPv4 address of the network interface(s) to listen on. Set to ['any'] to listen on all interfaces.                     |
+| `bind_listen_ipv4_port`                            | `[53]`               | A list of port numbers to listen on for IPv4 addresses.                                                                              |
+| `bind_listen_ipv6`                                 | `['::1']`            | A list of the IPv6 address of the network interface(s) to listen on                                                                  |
+| `bind_listen_ipv6_port`                            | `[53]`               | A list of port numbers to listen on for IPv6 addresses.                                                                              |
+| `bind_log`                                         | `data/named.run`     | Path to the log file                                                                                                                 |
+| `bind_other_logs`                                  | -                    | A list of logging channels to configure, with a separate mapping for each zone, with relevant details                                |
+| `bind_query_log`                                   | -                    | A mapping with keyss `file:` (e.g. `data/query.log`), `versions:`, `size:`. When defined, this will enable the query log             |
+| `bind_recursion`                                   | `false`              | Determines whether requests for which the DNS server is not authoritative should be forwarded†.                                      |
+| `bind_rrset_order`                                 | `random`             | Defines order for DNS round robin (either `random` or `cyclic`)                                                                      |
+| `bind_statistics_channels`                         | `false`              | If `true`, BIND is configured with a `statistics-channels` clause (currently only supports listening on a single interface)          |
+| `bind_statistics_allow`                            | `['127.0.0.1']`      | A list of hosts that can access the server statistics                                                                                |
+| `bind_statistics_host`                             | `127.0.0.1`          | IP address of the network interface that the statistics service should listen on                                                     |
+| `bind_statistics_port`                             | 8053                 | Network port that the statistics service should listen on                                                                            |
+| `bind_zone_dir`                                    | -                    | When defined, sets a custom absolute path to the server directory (for zone files, etc.) instead of the default.                     |
+| `bind_key_mapping`                                 | []                   | `Primary: Keyname` - mapping of TSIG keys to use for a specific primary                                                              |
+| `bind_zones`                                       | n/a                  | A list of mappings with zone definitions. See below this table for examples                                                          |
+| `- allow_update`                                   | `['none']`           | A list of hosts that are allowed to dynamically update this DNS zone.                                                                |
+| `- also_notify`                                    | -                    | A list of servers that will receive a notification when the primary zone file is reloaded.                                           |
+| `- create_forward_zones`                           | -                    | When initialized and set to `false`, creation of forward zones will be skipped (resulting in a reverse only zone)                    |
+| `- create_reverse_zones`                           | -                    | When initialized and set to `false`, creation of reverse zones will be skipped (resulting in a forward only zone)                    |
+| `- delegate`                                       | `[]`                 | Zone delegation.                                                                                                                     |
+| `- forwarders`                                     | -                    | List of forwarders for for the forward type zone                                                                                     |
+| `- hostmaster_email`                               | `hostmaster`         | The e-mail address of the system administrator for the zone                                                                          |
+| `- hosts`                                          | `[]`                 | Host definitions.                                                                                                                    |
+| `- ipv6_networks`                                  | `[]`                 | A list of the IPv6 networks that are part of the domain, in CIDR notation (e.g. 2001:db8::/48)                                       |
+| `- mail_servers`                                   | `[]`                 | A list of mappings (with keys `name:` and `preference:`) specifying the mail servers for this domain.                                |
+| `- name_servers`                                   | `[ansible_hostname]` | A list of the DNS servers for this domain.                                                                                           |
+| `- name`                                           | `example.com`        | The domain name                                                                                                                      |
+| `- naptr`                                          | `[]`                 | A list of mappings with keys `name:`, `order:`, `pref:`, `flags:`, `service:`, `regex:` and `replacement:` specifying NAPTR records. |
+| `- networks`                                       | `['10.0.2']`         | A list of the networks that are part of the domain                                                                                   |
+| `- other_name_servers`                             | `[]`                 | A list of the DNS servers outside of this domain.                                                                                    |
+| `- primaries`                                      | -                    | A list of primary DNS servers for this zone.                                                                                         |
+| `- services`                                       | `[]`                 | A list of services to be advertised by SRV records                                                                                   |
+| `- text`                                           | `[]`                 | A list of mappings with keys `name:` and `text:`, specifying TXT records. `text:` can be a list or string.                           |
+| `- caa`                                            | `[]`                 | A list of mappings with keys `name:` and `text:`, specifying CAA records. `text:` can be a list or string.                           |
+| `- type`                                           | -                    | Optional zone type. If not specified, autodetection will be used. Possible values include `primary`, `secondary` or `forward`        |
+| `- masterfile_format`                              | -                    | Sets the file format to store zone files in. Allowed values: `text`, `raw`                                                           |
+| `bind_zone_file_mode`                              | 0640                 | The file permissions for the main config file (named.conf)                                                                           |
+| `bind_zone_minimum_ttl`                            | `1D`                 | Minimum TTL field in the SOA record.                                                                                                 |
+| `bind_zone_time_to_expire`                         | `1W`                 | Time to expire field in the SOA record.                                                                                              |
+| `bind_zone_time_to_refresh`                        | `1D`                 | Time to refresh field in the SOA record.                                                                                             |
+| `bind_zone_time_to_retry`                          | `1H`                 | Time to retry field in the SOA record.                                                                                               |
+| `bind_zone_ttl`                                    | `1W`                 | Time to Live field in the SOA record.                                                                                                |
+| `bind_python_version`                              | -                    | The python version that should be used for ansible. Depends on Distro, either `2` or `3`. Defaults to the OS standard                |
+| `bind_reverse_lookup_zone_masterfile_format`       | -                    | `masterfile_format` for reverse lookup zone files, allwoed values: `text`, `raw`                                                     |
 
 † Best practice for an authoritative name server is to leave recursion turned off. However, [for some cases](http://www.zytrax.com/books/dns/ch7/queries.html#allow-query-cache) it may be necessary to have recursion turned on.
 
