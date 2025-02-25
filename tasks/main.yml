@@ -180,10 +180,6 @@
   failed_when: check_named.rc not in [0,1]
   changed_when: false
 
-- name: show templating results
-  ansible.builtin.debug:
-    msg: "{{ lookup('ansible.builtin.template', './etc_named.conf.j2') }}"
-
 - name: Main BIND config file (with validation)
   ansible.builtin.template:
     src: etc_named.conf.j2

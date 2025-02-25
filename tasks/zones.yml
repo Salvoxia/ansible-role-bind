@@ -248,7 +248,7 @@
   tags: bind
   block:
     - name: Compile forward lookup zone files
-      ansible.builtin.shell: "named-compilezone -f text -F raw -o {{ bind_zone_dir }}/{{ zone_file.item.name }} {{ zone_file.item.name }} {{ zone_file.dest }}"
+      ansible.builtin.command: "named-compilezone -f text -F raw -o {{ bind_zone_dir }}/{{ zone_file.item.name }} {{ zone_file.item.name }} {{ zone_file.dest }}"
       when:
         - zone_file.changed
         - bind_zone_auxiliary[zone_file.item.name].masterfile_format == 'raw'
@@ -258,7 +258,8 @@
         loop_var: zone_file
 
     - name: Compile reverse lookup zone files
-      ansible.builtin.shell: "named-compilezone -f text -F raw -o {{ zone_file.dest | regex_replace('^(.*)\\.text$', '\\1') }} {{ zone_file.dest | regex_search('([^\/]+(?=\/$|\\.text$))', '\\1') | first }} {{ zone_file.dest }}"
+      ansible.builtin.command: "named-compilezone -f text -F raw -o {{ zone_file.dest | regex_replace('^(.*)\\.text$', '\\1') }}
+                              {{ zone_file.dest | regex_search('([^\/]+(?=\/$|\\.text$))', '\\1') | first }} {{ zone_file.dest }}"
       when:
         - zone_file.changed
         - bind_reverse_lookup_zone_masterfile_format == 'raw'
@@ -268,7 +269,8 @@
         loop_var: zone_file
 
     - name: Compile IPv6 reverse lookup zone files
-      ansible.builtin.shell: "named-compilezone -f text -F raw -o {{ zone_file.dest | regex_replace('^(.*)\\.text$', '\\1')  }} {{ zone_file.dest | regex_search('([^\/]+(?=\/$|\\.text$))', '\\1') | first }} {{ zone_file.dest }}"
+      ansible.builtin.command: "named-compilezone -f text -F raw -o {{ zone_file.dest | regex_replace('^(.*)\\.text$', '\\1') }}
+                              {{ zone_file.dest | regex_search('([^\/]+(?=\/$|\\.text$))', '\\1') | first }} {{ zone_file.dest }}"
       when:
         - zone_file.changed
         - bind_reverse_lookup_zone_masterfile_format == 'raw'
