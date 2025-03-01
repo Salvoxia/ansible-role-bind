@@ -90,8 +90,8 @@
       ansible.builtin.template:
         src: bind_zone.j2
         dest: "{{ bind_zone_dir }}/{{ item.name }}{{'.text' if bind_zone_auxiliary[item.name].masterfile_format == 'raw' }}"
-        owner: "{{ bind_owner }}"
-        group: "{{ bind_group }}"
+        owner: "{{ (bind_zone_file_owner_override | length > 0) | ternary(bind_zone_file_owner_override, bind_owner) }}"
+        group: "{{ (bind_zone_file_group_override | length > 0) | ternary(bind_zone_file_group_override, bind_group) }}"
         mode: "{{ bind_zone_file_mode }}"
         setype: named_zone_t
         validate: 'named-checkzone -d {{ item.name }} %s'
@@ -113,8 +113,8 @@
       ansible.builtin.template:
         src: reverse_zone.j2
         dest: "{{ bind_zone_dir }}/{{ ('.'.join(item.1.replace(item.1+'.','').split('.')[::-1])) }}.in-addr.arpa{{'.text' if bind_reverse_lookup_zone_masterfile_format == 'raw' }}"
-        owner: "{{ bind_owner }}"
-        group: "{{ bind_group }}"
+        owner: "{{ (bind_zone_file_owner_override | length > 0) | ternary(bind_zone_file_owner_override, bind_owner) }}"
+        group: "{{ (bind_zone_file_group_override | length > 0) | ternary(bind_zone_file_group_override, bind_group) }}"
         mode: "{{ bind_zone_file_mode }}"
         setype: named_zone_t
         validate: "named-checkzone {{ ('.'.join(item.1.replace(item.1+'.','').split('.')[::-1])) }}.in-addr.arpa %s"
@@ -140,8 +140,8 @@
         src: reverse_zone_ipv6.j2
         dest: "{{ bind_zone_dir }}/{{ (item.1 | ansible.utils.ipaddr('revdns'))[-(9+(item.1|regex_replace('^.*/','')|int)//2):-1] }}\
               {{ '.text' if bind_reverse_lookup_zone_masterfile_format == 'raw' }}"
-        owner: "{{ bind_owner }}"
-        group: "{{ bind_group }}"
+        owner: "{{ (bind_zone_file_owner_override | length > 0) | ternary(bind_zone_file_owner_override, bind_owner) }}"
+        group: "{{ (bind_zone_file_group_override | length > 0) | ternary(bind_zone_file_group_override, bind_group) }}"
         mode: "{{ bind_zone_file_mode }}"
         setype: named_zone_t
         validate: "named-checkzone {{ (item.1 | ansible.utils.ipaddr('revdns'))[-(9+(item.1|regex_replace('^.*/','')|int)//2):] }} %s"
@@ -169,8 +169,8 @@
       ansible.builtin.template:
         src: bind_zone.j2
         dest: "{{ bind_zone_dir }}/{{ item.name }}{{'.text' if bind_reverse_lookup_zone_masterfile_format == 'raw' }}"
-        owner: "{{ bind_owner }}"
-        group: "{{ bind_group }}"
+        owner: "{{ (bind_zone_file_owner_override | length > 0) | ternary(bind_zone_file_owner_override, bind_owner) }}"
+        group: "{{ (bind_zone_file_group_override | length > 0) | ternary(bind_zone_file_group_override, bind_group) }}"
         mode: "{{ bind_zone_file_mode }}"
         setype: named_zone_t
       become: true
@@ -190,8 +190,8 @@
       ansible.builtin.template:
         src: reverse_zone.j2
         dest: "{{ bind_zone_dir }}/{{ ('.'.join(item.1.replace(item.1+'.','').split('.')[::-1])) }}.in-addr.arpa{{'.text' if bind_reverse_lookup_zone_masterfile_format == 'raw' }}"
-        owner: "{{ bind_owner }}"
-        group: "{{ bind_group }}"
+        owner: "{{ (bind_zone_file_owner_override | length > 0) | ternary(bind_zone_file_owner_override, bind_owner) }}"
+        group: "{{ (bind_zone_file_group_override | length > 0) | ternary(bind_zone_file_group_override, bind_group) }}"
         mode: "{{ bind_zone_file_mode }}"
         setype: named_zone_t
       become: true
@@ -215,8 +215,8 @@
         src: reverse_zone_ipv6.j2
         dest: "{{ bind_zone_dir }}/{{ (item.1 | ansible.utils.ipaddr('revdns'))[-(9+(item.1|regex_replace('^.*/','')|int)//2):-1] }}\
                 {{ '.text' if bind_reverse_lookup_zone_masterfile_format == 'raw' }}"
-        owner: "{{ bind_owner }}"
-        group: "{{ bind_group }}"
+        owner: "{{ (bind_zone_file_owner_override | length > 0) | ternary(bind_zone_file_owner_override, bind_owner) }}"
+        group: "{{ (bind_zone_file_group_override | length > 0) | ternary(bind_zone_file_group_override, bind_group) }}"
         mode: "{{ bind_zone_file_mode }}"
         setype: named_zone_t
       become: true

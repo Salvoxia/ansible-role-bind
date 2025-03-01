@@ -1,5 +1,4 @@
 ---
-
 # Initialise distribution-specific variables
 - name: Source specific variables
   ansible.builtin.include_vars: "{{ item }}"
@@ -11,6 +10,7 @@
     - "{{ ansible_distribution_file_variety }}-{{ ansible_distribution_major_version }}.yml"
     - "{{ ansible_distribution_file_variety }}.yml"
   tags: bind
+
 
 - name: Check `primaries` or `forwarders` was set for each zone
   ansible.builtin.assert:
@@ -101,9 +101,9 @@
 - name: Ensure bind_conf_dir exists
   ansible.builtin.file:
     path: "{{ bind_conf_dir }}"
-    owner: "root"
+    owner: "{{ bind_owner }}"
     group: "{{ bind_group }}"
-    mode: "02745"
+    mode: "02755"
     state: directory
   when: not bind_manage_service
 
@@ -215,6 +215,10 @@
   become: true
   tags: bind
   when: bind_manage_service
+  retries: 5
+  delay: 5
+  register: start_service_result
+  until: start_service_result is not failed
 
 - name: Flush handlers to reload BIND
   ansible.builtin.meta: flush_handlers
