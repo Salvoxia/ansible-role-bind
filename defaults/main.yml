@@ -103,3 +103,7 @@ bind_manage_service: true
 
 # Setting for reverse lookup zone file format, either 'text' or 'raw'
 bind_reverse_lookup_zone_masterfile_format: ""
+
+# Allows for overriding default zone file user/group
+bind_zone_file_owner_override: ""
+bind_zone_file_group_override: ""
