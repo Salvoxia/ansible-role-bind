@@ -90,6 +90,7 @@ The packages `python-netaddr` (required for the [`ansible.utils.ipaddr`](https:/
 | `- text`                                           | `[]`                 | A list of mappings with keys `name:` and `text:`, specifying TXT records. `text:` can be a list or string.                           |
 | `- caa`                                            | `[]`                 | A list of mappings with keys `name:` and `text:`, specifying CAA records. `text:` can be a list or string.                           |
 | `- type`                                           | -                    | Optional zone type. If not specified, autodetection will be used. Possible values include `primary`, `secondary` or `forward`        |
+| `- ttl`                                            | `bind_zone_ttl`      | Optional ttl for this zone. If not specified, use default value `bind_zone_ttl`                                                      |
 | `- masterfile_format`                              | -                    | Sets the file format to store zone files in. Allowed values: `text`, `raw`                                                           |
 | `bind_zone_file_mode`                              | 0640                 | The file permissions for the main config file (named.conf)                                                                           |
 | `bind_zone_minimum_ttl`                            | `1D`                 | Minimum TTL field in the SOA record.                                                                                                 |
