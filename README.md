@@ -512,6 +512,7 @@ Contributors:
 - [Loic Dachary](http://dachary.org)
 - [Mario Ciccarelli](https://github.com/kartone)
 - [Michail Alexakis](https://github.com/drmalex07)
+- [Mike Sidorov](https://github.com/mikelsid)
 - [Miroslav Hudec](https://github.com/mihudec)
 - [Otto Sabart](https://github.com/seberm)
 - [Paulius Mazeika](https://github.com/pauliusm)
