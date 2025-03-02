@@ -514,6 +514,7 @@ Contributors:
 - [Michail Alexakis](https://github.com/drmalex07)
 - [Mike Sidorov](https://github.com/mikelsid)
 - [Miroslav Hudec](https://github.com/mihudec)
+- [mytlogos](https://github.com/mytlogos)
 - [Otto Sabart](https://github.com/seberm)
 - [Paulius Mazeika](https://github.com/pauliusm)
 - [Paulo E. Castro](https://github.com/pecastro)
