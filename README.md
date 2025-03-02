@@ -551,4 +551,5 @@ Contributors:
 - [Shawn Wilsher](https://github.com/sdwilsh)
 - [Tom Meinlschmidt](https://github.com/tmeinlschmidt)
 - [Jascha Sticher](https://github.com/itbane)
+- [Yannik Sembritzki](https://github.com/Yannik)
 - [Zephyr82](https://github.com/Zephyr82)
