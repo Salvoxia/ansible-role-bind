@@ -151,7 +151,6 @@ include "{{ bind_tsig_file }}";
 {% set dummy = _also_notify.append(also_notify_string) %}
 {% endfor %}
 {% endif %}
-{% if bind_zone.create_forward_zones is not defined or bind_zone.create_forward_zones %}
 {# Start: set zone type  #}
 {% if bind_zone.type is defined and bind_zone.type == 'primary' %}
 {% set _type = 'primary' %}
@@ -167,6 +166,8 @@ include "{{ bind_tsig_file }}";
 {% set _type = 'forward' %}
 {% endif %}
 {# End: set zone type #}
+
+{% if bind_zone.create_forward_zones is not defined or bind_zone.create_forward_zones %}
 
 {# Start: set mapped primaries for the zone #}
 {% if bind_key_mapping | length != 0 %}
