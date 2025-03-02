@@ -41,7 +41,7 @@
 
 - name: Install BIND
   ansible.builtin.package:
-    pkg: "{{ item }}"
+    name: "{{ item }}"
     state: present
   become: true
   when: bind_manage_service
