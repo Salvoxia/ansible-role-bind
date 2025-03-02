@@ -512,6 +512,7 @@ Contributors:
 
 - [Aido](https://github.com/aido)
 - [Angel Barrera](https://github.com/angelbarrera92)
+- [Arnaud Patard](https://github.com/apatard/)
 - [B. Verschueren](https://github.com/bverschueren)
 - [Boris Momčilović](https://github.com/kornrunner)
 - [Boschung-Mecatronic-AG-Infrastructure](https://github.com/Boschung-Mecatronic-AG-Infrastructure)
