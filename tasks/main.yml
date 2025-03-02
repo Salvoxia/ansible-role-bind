@@ -16,7 +16,7 @@
   ansible.builtin.assert:
     that:
       - (item.type is defined and item.type == 'primary') or item.primaries is defined or item.forwarders is defined
-    quiet: yes
+    quiet: true
   loop: "{{ bind_zones }}"
   loop_control:
     label: "{{ item.name }}"
