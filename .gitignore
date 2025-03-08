@@ -21,6 +21,7 @@ docker-tests/
 # Ignore editor directories
 /.idea
 /.vscode
+/.ansible
 
 # Ignore Ansible fact cache
 .cache/
