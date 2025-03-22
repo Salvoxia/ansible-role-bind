@@ -9,4 +9,4 @@
       ansible.builtin.set_fact:
         bind_manage_service: true
   roles:
-    - role: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') | basename }}"
+    - role: "salvoxia.bind"
