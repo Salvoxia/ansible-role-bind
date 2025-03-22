@@ -6,9 +6,30 @@ This file adheres to the guidelines of [http://keepachangelog.com/](http://keepa
 
 Since this is a for of the [original role](https://github.com/bertvv/ansible-role-bind), the versioning scheme has been reset to `1.0.0`. 
 
+## 1.1.0 - 2025-03-22
+
+Added new features and merged un-merged PRs from original role.
+
+### Added
+  - [(GH-4)](https://github.com/Salvoxia/ansible-role-bind/pull/4) Added the ability to use bind_tsig_keys to use with dynamics updates (useful cases: DHCP integration and Certbot DNS challenge automation) (credit: [brunobenchimol](https://github.com/brunobenchimol))
+  - [(GH-5)](https://github.com/Salvoxia/ansible-role-bind/pull/5) Added new flag `bind_manage_service` to control whether bind is installed, started and the service is enabled. Setting to `false` allows to generate configuration files only.
+  - [(GH-6)](https://github.com/Salvoxia/ansible-role-bind/pull/6) Added support for `masterfile_format` setting for zones and reverse zones
+  - [(GH-8)](https://github.com/Salvoxia/ansible-role-bind/pull/8) Add Alpine Linux support (credit: [Paulius Mažeika](https://github.com/pauliusm))
+  - [(GH-9)](https://github.com/Salvoxia/ansible-role-bind/pull/9) Added allow-query per zone (credit: [Boschung-Mecatronic-AG-Infrastructure](https://github.com/Boschung-Mecatronic-AG-Infrastructure))
+  - [(GH-13)](https://github.com/Salvoxia/ansible-role-bind/pull/13) Permit a different TTL per DNS Zone (credit: Christian IUGA)
+
+### Modified
+   - [(GH-10)](https://github.com/Salvoxia/ansible-role-bind/pull/10) Fixed reverse zone generation for hosts with multiple IPs (credit: [Mike Sidorov](https://github.com/mikelsid))
+   - [(GH-11)](https://github.com/Salvoxia/ansible-role-bind/pull/11) Python Version Check: Convert python version returned by Ansible to string before comparison (credit: [mytlogos](https://github.com/mytlogos))
+   - [(GH-12)](https://github.com/Salvoxia/ansible-role-bind/pull/12) Added the possibility to create MX records only for sub-zones without creating the full sub-zone (credit: Christian IUGA)
+   - [(GH-14)](https://github.com/Salvoxia/ansible-role-bind/pull/14) Fix Ansible error when a reverse zone only is specified without explicit type definition (apply zone type detection to reverse zones as well) (credit: [Arnaud Patard](https://github.com/apatard/))
+   - [(GH-15)](https://github.com/Salvoxia/ansible-role-bind/pull/15) Do not require primaries in zone definition when type is explicitly set to `primary` (credit: [Yannik Sembritzki](https://github.com/Yannik))
+   - [(GH-16)](https://github.com/Salvoxia/ansible-role-bind/pull/16) Make sure `bind_zone_file_owner_override` and `bind_zone_file_group_override` do exist if specified.
+
+
 ## 1.0.0 - 2025-01-11
 
-First release of the this fork.
+First release of this fork.
 
 ### Added
  - [Explicitly add public-facing IP to host_all_addresses to handle NAT/floating-ip](https://github.com/Salvoxia/ansible-role-bind/commit/772495bfdb042b82c9dfb1f21b1b983772037ec3) (credit: [Rowan Thorpe](https://github.com/rowanthorpe))

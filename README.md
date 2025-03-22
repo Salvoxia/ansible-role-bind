@@ -521,6 +521,8 @@ Contributors:
 - [Boris Momčilović](https://github.com/kornrunner)
 - [Boschung-Mecatronic-AG-Infrastructure](https://github.com/Boschung-Mecatronic-AG-Infrastructure)
 - [Brad Durrow](https://github.com/bdurrow)
+- [brunobenchimol](https://github.com/brunobenchimol)
+- Christian IUGA
 - [Christopher Hicks](http://www.chicks.net/)
 - [David J. Haines](https://github.com/dhaines)
 - [Fabio Rocha](https://github.com/frock81)
@@ -542,7 +544,7 @@ Contributors:
 - [Miroslav Hudec](https://github.com/mihudec)
 - [mytlogos](https://github.com/mytlogos)
 - [Otto Sabart](https://github.com/seberm)
-- [Paulius Mazeika](https://github.com/pauliusm)
+- [Paulius Mažeika](https://github.com/pauliusm)
 - [Paulo E. Castro](https://github.com/pecastro)
 - [Peter Janes](https://github.com/peterjanes)
 - [psa](https://github.com/psa)
