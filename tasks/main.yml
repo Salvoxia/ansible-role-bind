@@ -65,6 +65,24 @@
     - bind_owner != 'root'
     - not bind_manage_service
 
+- name: Ensure bind_zone_file_group_override exists
+  ansible.builtin.group:
+    name: "{{ bind_zone_file_group_override }}"
+    state: present
+  when:
+    - bind_zone_file_group_override | length > 0
+    - bind_zone_file_group_override != 'root'
+
+- name: Ensure bind_zone_file_owner_override exists
+  ansible.builtin.user:
+    name: "{{ (bind_zone_file_owner_override | length > 0) | ternary(bind_zone_file_owner_override, bind_owner) }}"
+    group: "{{ (bind_zone_file_group_override | length > 0) | ternary(bind_zone_file_group_override, bind_group) }}"
+    create_home: false
+    state: present
+  when:
+    - bind_zone_file_owner_override | length > 0
+    - bind_zone_file_owner_override != 'root'
+
 - name: Ensure runtime directories referenced in config exist
   ansible.builtin.file:
     path: "{{ item }}"
