@@ -3,14 +3,8 @@
 # Remark that common variables are defined in `group_vars/all.yml`
 
 - name: Primary/Secondary with Shared Inventory
-  hosts: dns
+  hosts: all
   pre_tasks:
-    - name: Set zone-file owner
-      ansible.builtin.set_fact:
-        bind_zone_file_owner_override: "bind"
-        bind_zone_file_group_override: "bind"
-      when: ansible_distribution == 'Debian'
-
     - name: "Old Debian: Switch source repo to archive "
       ansible.builtin.replace:
         path: /etc/apt/sources.list
