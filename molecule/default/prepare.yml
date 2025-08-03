@@ -3,7 +3,7 @@
 # Remark that common variables are defined in `group_vars/all.yml`
 
 - name: Primary/Secondary with Shared Inventory
-  hosts: dns
+  hosts: all
   pre_tasks:
     - name: "Old Debian: Switch source repo to archive "
       ansible.builtin.replace:
