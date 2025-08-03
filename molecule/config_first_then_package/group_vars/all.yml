@@ -70,6 +70,8 @@ bind_zones:
       - ns2
     also_notify:
       - 10.11.0.5
+    allow_notify:
+      - 10.11.0.4
     hosts:
       - name: ns1
         ip: 10.11.0.4

@@ -75,6 +75,7 @@ The following Ansible collections are required:
 | `bind_zones`                                       | n/a                  | A list of mappings with zone definitions. See below this table for examples                                                          |
 | `- allow_update`                                   | `['none']`           | A list of hosts that are allowed to dynamically update this DNS zone.                                                                |
 | `- also_notify`                                    | -                    | A list of servers that will receive a notification when the primary zone file is reloaded.                                           |
+| `- allow_notify`                                   | -                    | A list of servers from which a zone update notification is accepted.                                                                 |
 | `- create_forward_zones`                           | -                    | When initialized and set to `false`, creation of forward zones will be skipped (resulting in a reverse only zone)                    |
 | `- create_reverse_zones`                           | -                    | When initialized and set to `false`, creation of reverse zones will be skipped (resulting in a forward only zone)                    |
 | `- delegate`                                       | `[]`                 | Zone delegation.                                                                                                                     |

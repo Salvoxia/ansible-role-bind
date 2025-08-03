@@ -230,6 +230,15 @@ zone "{{ bind_zone.name }}" IN {
   notify explicit;
   masters { {{ _primaries | join('; ') }}; };
   file "{{ bind_secondary_dir }}/{{ bind_zone.name }}";
+{% if bind_zone.allow_notify is defined %}
+  allow-notify {
+{% for upstream in bind_zone.allow_notify %}
+{% if upstream not in host_all_addresses %}
+    {{ upstream }};
+{% endif %}
+{% endfor %}
+  };
+{% endif %}
 {% elif _type == 'forward' %}
   type forward;
   forward only;
@@ -293,6 +302,15 @@ zone "{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr
   type slave;
   masters { {{ _primaries | join('; ') }}; };
   file "{{ bind_secondary_dir }}/{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa";
+{% if bind_zone.allow_notify is defined %}
+  allow-notify {
+{% for upstream in bind_zone.allow_notify %}
+{% if upstream not in host_all_addresses %}
+    {{ upstream }};
+{% endif %}
+{% endfor %}
+  };
+{% endif %}
 {% elif _type == 'forward' %}
   type forward;
   forward only;
@@ -355,6 +373,15 @@ zone "{{ (network | ansible.utils.ipaddr('revdns'))[-(9+(network|regex_replace('
   type slave;
   masters { {{ _primaries | join('; ') }}; };
   file "{{ bind_secondary_dir }}/{{ (network | ansible.utils.ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):-1] }}";
+{% if bind_zone.allow_notify is defined %}
+  allow-notify {
+{% for upstream in bind_zone.allow_notify %}
+{% if upstream not in host_all_addresses %}
+    {{ upstream }};
+{% endif %}
+{% endfor %}
+  };
+{% endif %}
 {% elif _type == 'forward' %}
   type forward;
   forward only;
