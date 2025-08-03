@@ -6,6 +6,11 @@ This file adheres to the guidelines of [http://keepachangelog.com/](http://keepa
 
 Since this is a for of the [original role](https://github.com/bertvv/ansible-role-bind), the versioning scheme has been reset to `1.0.0`. 
 
+## 1.2.0 - 2025-08-03
+
+### Added
+  - [(GH-17)](https://github.com/Salvoxia/ansible-role-bind/pull/17) Added support for [`allow-notify`](https://bind9.readthedocs.io/en/latest/reference.html#namedconf-statement-allow-notify) per zone
+
 ## 1.1.0 - 2025-03-22
 
 Added new features and merged un-merged PRs from original role.
