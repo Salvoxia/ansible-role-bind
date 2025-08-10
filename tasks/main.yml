@@ -170,7 +170,7 @@
     (((item.type is defined and item.type == 'primary') or
     (item.type is not defined and bind_zone_auxiliary[item.name]['primaries_dict'] is defined and
     (host_all_addresses | intersect(bind_zone_auxiliary[item.name]['primaries_dict'].keys()) | length > 0))) and
-    (ansible_facts.services[bind_service].state == "running") and (item.allow_update | default(false)))
+    (ansible_facts.services[bind_service].state == "running") and (item.allow_update is defined and item.allow_update | length > 0))
   with_items: '{{ bind_zones }}'
   tags: bind
 
@@ -255,6 +255,6 @@
     (((item.type is defined and item.type == 'primary') or
     (item.type is not defined and bind_zone_auxiliary[item.name]['primaries_dict'] is defined and
     (host_all_addresses | intersect(bind_zone_auxiliary[item.name]['primaries_dict'].keys()) | length > 0))) and
-    (ansible_facts.services[bind_service].state == "running") and (item.allow_update | default(false)))
+    (ansible_facts.services[bind_service].state == "running") and (item.allow_update is defined and item.allow_update | length > 0))
   with_items: '{{ bind_zones }}'
   tags: bind
