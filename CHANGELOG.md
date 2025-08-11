@@ -6,6 +6,19 @@ This file adheres to the guidelines of [http://keepachangelog.com/](http://keepa
 
 Since this is a for of the [original role](https://github.com/bertvv/ansible-role-bind), the versioning scheme has been reset to `1.0.0`. 
 
+## 1.3.0 - 2025-08-11
+
+### Added
+  - [(GH-18)](https://github.com/Salvoxia/ansible-role-bind/pull/18) Added support Debian 13 Trixie
+> [!IMPORTANT]
+> Potentially breaking change in role defaults: `bind_dnssec_validation` now defaults to __`false`__
+>
+> `bind_dnssec_validation` has defaulted to `true` in the past. However, BIND versions on supported operating systems defaulted to not actually activating DNSSEC validation unless explicit `trust-anchors` had been configured as well.  This effectively resulted in DNSSEC being disabled by default when no other configuration was added.  
+> Newer BIND versions (such as installed on Debian 13) require `trust-anchors` to be configured to actually start with `dnssec-validation` set to `true`.  
+> The new alternative is to set it to `auto` to let BIND automatically manage keys.  
+> If you have `trust-anchors` configured for your setup, you must explicitly set `bind_dnssec_validation` to `true` to keep DNSSEC validation enabled.
+
+
 ## 1.2.0 - 2025-08-03
 
 ### Added
