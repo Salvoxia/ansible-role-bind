@@ -1,0 +1,43 @@
+# Distro specific variables for Debian
+---
+bind_default_python_version: '3'
+bind_packages:
+  - "{{ (bind_python_version | string == '3') | ternary('python3-netaddr', 'python-netaddr') }}"
+  - "{{ (bind_python_version | string == '3') | ternary('python3-dnspython', 'python-dnspython') }}"
+  - bind9
+  - bind9-utils
+
+bind_service: named
+
+# Main config file
+bind_config: /etc/bind/named.conf
+
+bind_default_zone_files:
+  # bind9 on Debian 13 moved options configuration to a separate file, the main named.conf
+  # merely includes the following three files.
+  # To keep the integrity of this role, the file named.conf.options is not included
+  # since the options configured by this role are written directly to named.conf.
+  # - /etc/bind/named.conf.options
+  - /etc/bind/named.conf.local
+  - /etc/bind/named.conf.root-hints
+
+# Directory with run-time stuff
+bind_dir: /var/cache/bind
+bind_conf_dir: "/etc/bind"
+auth_file: "auth_transfer.conf"
+bind_auth_file: "{{ bind_conf_dir }}/{{ auth_file }}"
+
+# tsig key file
+tsig_file: "tsig_keys.conf"
+bind_tsig_file: "{{ bind_conf_dir }}/{{ tsig_file }}"
+
+bind_owner: root
+bind_group: bind
+
+bind_bindkeys_file: ""
+bind_pid_file: "/run/named/named.pid"
+bind_session_keyfile: "/run/named/session.key"
+
+# Custom location for zone files
+bind_zone_dir: "{{ bind_dir }}"
+bind_secondary_dir: "{{ bind_dir }}/secondary"

@@ -1,6 +1,5 @@
 ---
 # Primary Configuration
-
 bind_zones:
   # Primary server for domain example.com (use zone type autodetection)
   - name: 'example.com'

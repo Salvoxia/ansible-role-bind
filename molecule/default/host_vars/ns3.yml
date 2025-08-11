@@ -1,7 +1,5 @@
 ---
 # Forwarder Configuration
-
-bind_dnssec_validation: false
 bind_zones:
   # Forwarder for domain example.com (use zone type autodetection)
   - name: 'example.com'

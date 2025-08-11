@@ -34,7 +34,7 @@
   tags: bind
 
 - name: Dump/flush dynamic ipv6 reverse zone changes to disk/zone file
-  ansible.builtin.command: "rndc sync -clean {{ (item.1 | ipaddr('revdns'))[-(9+(item.1|regex_replace('^.*/','')|int)//2):-1] }}"
+  ansible.builtin.command: "rndc sync -clean {{ (item.1 | ansible.utils.ipaddr('revdns'))[-(9+(item.1|regex_replace('^.*/','')|int)//2):-1] }}"
   with_subelements:
     - "{{ bind_zones }}"
     - ipv6_networks

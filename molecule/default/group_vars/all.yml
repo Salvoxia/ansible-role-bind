@@ -1,5 +1,6 @@
 ---
 bind_statistics_channels: true
+bind_dnssec_validation: false
 bind_statistics_allow:
   - any
 bind_zone_dir: /var/local/named-zones
