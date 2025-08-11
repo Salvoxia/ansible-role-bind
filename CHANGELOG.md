@@ -9,7 +9,7 @@ Since this is a for of the [original role](https://github.com/bertvv/ansible-rol
 ## 1.3.0 - 2025-08-11
 
 ### Added
-  - [(GH-18)](https://github.com/Salvoxia/ansible-role-bind/pull/18) Added support Debian 13 Trixie
+  - [(GH-18)](https://github.com/Salvoxia/ansible-role-bind/pull/18) Added support for Debian 13 Trixie
 > [!IMPORTANT]
 > Potentially breaking change in role defaults: `bind_dnssec_validation` now defaults to __`false`__
 >
