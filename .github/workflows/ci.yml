@@ -69,7 +69,7 @@ jobs:
 
       # community.general version >= 9.5.0 is required for the 'dig' lookup filter to support the 'port' parameter
       - name: Install ansible dependencies (CentOS 8 / Debian 10).
-        run: ansible-galaxy collection install community.general>=9.5.0 --force
+        run: ansible-galaxy collection install community.general>=12 --force
         if: matrix.distro == 'centos8' || matrix.distro == 'debian10'
 
       - name: Install test dependencies.
