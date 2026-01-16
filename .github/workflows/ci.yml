@@ -63,6 +63,10 @@ jobs:
         run: pip3 install ansible==9.13.0 molecule molecule-plugins[docker] yamllint ansible-lint docker netaddr dnspython ansible-compat>=25.1.4
         if: matrix.distro == 'centos8' || matrix.distro == 'debian10'
 
+      - name: Install community.general specific version
+        run: ansible-galaxy collection install "community.general<12"
+        if: matrix.distro == 'centos8' || matrix.distro == 'debian10'
+
       # community.general version >= 9.5.0 is required for the 'dig' lookup filter to support the 'port' parameter
       - name: Install ansible dependencies (CentOS 8 / Debian 10).
         run: ansible-galaxy collection install community.general>=9.5.0 --force
