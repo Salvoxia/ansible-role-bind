@@ -52,6 +52,9 @@ bind_recursion: false
 bind_allow_recursion:
   - "any"
 
+# Set max-recursion-queries
+bind_max_recursion_queries: 50
+
 # Allows BIND to be set up as a caching name server
 bind_forward_only: false
 
