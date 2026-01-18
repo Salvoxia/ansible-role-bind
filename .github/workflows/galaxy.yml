@@ -39,6 +39,7 @@ jobs:
           - debian10
           - debian11
           - debian12
+          - debian13
           - ubuntu2204
           - ubuntu2404
 
@@ -46,10 +47,17 @@ jobs:
       - name: Check out the codebase.
         uses: actions/checkout@v4
 
+      - name: Set up Python 3 (CentOS 8 / Debian 10).
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+        if: matrix.distro == 'centos8' || matrix.distro == 'debian10'
+
       - name: Set up Python 3
         uses: actions/setup-python@v5
         with:
           python-version: '3.x'
+        if: matrix.distro != 'centos8' && matrix.distro != 'debian10'
 
       - name: Install test dependencies (CentOS 8 / Debian 10).
         run: pip3 install ansible==9.13.0 molecule molecule-plugins[docker] yamllint ansible-lint docker netaddr dnspython ansible-compat>=25.1.4
@@ -57,7 +65,7 @@ jobs:
 
       # community.general version >= 9.5.0 is required for the 'dig' lookup filter to support the 'port' parameter
       - name: Install ansible dependencies (CentOS 8 / Debian 10).
-        run: ansible-galaxy collection install community.general>=9.5.0 --force
+        run: ansible-galaxy collection install 'community.general:>=9.5.0,<=11' --force
         if: matrix.distro == 'centos8' || matrix.distro == 'debian10'
 
       - name: Install test dependencies.
