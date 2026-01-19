@@ -6,6 +6,17 @@ This file adheres to the guidelines of [http://keepachangelog.com/](http://keepa
 
 Since this is a for of the [original role](https://github.com/bertvv/ansible-role-bind), the versioning scheme has been reset to `1.0.0`. 
 
+## 1.4.0 - 2026-01-19
+
+### Added
+  - [(GH-21)](https://github.com/Salvoxia/ansible-role-bind/pull/21) feat: Support `max-recursion-queries` setting
+
+### Modified
+These changes are meta-changes to keep the role's CI going, there are no changes to functionality.
+  - [(GH-19)](https://github.com/Salvoxia/ansible-role-bind/pull/19) chore: Use `molecule-plugins[docker]` instead of `molecule-docker`
+  - [(GH-20)](https://github.com/Salvoxia/ansible-role-bind/pull/20) CI Workflow: Use Python 3.11 / ansible community.general <= 11 for CentoOS 8 / Debian 10 molecule tests
+
+
 ## 1.3.0 - 2025-08-11
 
 ### Added
