@@ -64,6 +64,7 @@ The following Ansible collections are required:
 | `bind_other_logs`                                  | -                    | A list of logging channels to configure, with a separate mapping for each zone, with relevant details                                |
 | `bind_query_log`                                   | -                    | A mapping with keyss `file:` (e.g. `data/query.log`), `versions:`, `size:`. When defined, this will enable the query log             |
 | `bind_recursion`                                   | `false`              | Determines whether requests for which the DNS server is not authoritative should be forwarded†.                                      |
+| `bind_max_recursion_queries`                       | `50`              | Sets the `max-recursion-queries` setting if `bind_recursion` is set to `true`                                     |
 | `bind_rrset_order`                                 | `random`             | Defines order for DNS round robin (either `random` or `cyclic`)                                                                      |
 | `bind_statistics_channels`                         | `false`              | If `true`, BIND is configured with a `statistics-channels` clause (currently only supports listening on a single interface)          |
 | `bind_statistics_allow`                            | `['127.0.0.1']`      | A list of hosts that can access the server statistics                                                                                |
