@@ -78,7 +78,7 @@ jobs:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
           MOLECULE_DISTRO: ${{ matrix.distro }}
-        if: ${{ vars.MOLECULE_DEBUG }} != 'true'
+        if: vars.MOLECULE_DEBUG != 'true'
 
       - name: Run Molecule Tests with verbose logging
         run: molecule test --all -- -vv
@@ -86,4 +86,4 @@ jobs:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
           MOLECULE_DISTRO: ${{ matrix.distro }}
-        if: ${{ vars.MOLECULE_DEBUG }} == 'true'
+        if: vars.MOLECULE_DEBUG == 'true'
