@@ -78,17 +78,12 @@ jobs:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
           MOLECULE_DISTRO: ${{ matrix.distro }}
+        if: env.MOLECULE_DEBUG != 'true'
 
-      - name: Run Molecule Shared Inventory tests
-        run: molecule test --scenario-name shared_inventory
+      - name: Run Molecule Primary/Secondary/Forwarder tests
+        run: molecule test --all -- -vv
         env:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
           MOLECULE_DISTRO: ${{ matrix.distro }}
-
-      - name: Run Molecule Shared Inventory tests with non-standard ports
-        run: molecule test --scenario-name shared_inventory_nonstandard_ports
-        env:
-          PY_COLORS: '1'
-          ANSIBLE_FORCE_COLOR: '1'
-          MOLECULE_DISTRO: ${{ matrix.distro }}
+        if: env.MOLECULE_DEBUG == 'true'
