@@ -72,11 +72,18 @@ jobs:
         run: pip3 install ansible molecule molecule-plugins[docker] yamllint ansible-lint docker netaddr dnspython ansible-compat>=25.1.4
         if: matrix.distro != 'centos8' && matrix.distro != 'debian10'
 
+      - name: Run Molecule Tests
+        run: molecule test --all
+        env:
+          PY_COLORS: '1'
+          ANSIBLE_FORCE_COLOR: '1'
+          MOLECULE_DISTRO: ${{ matrix.distro }}
+        if: ${{ vars.MOLECULE_DEBUG }} != 'true'
 
-
-      - name: Run Molecule Primary/Secondary/Forwarder tests
+      - name: Run Molecule Tests with verbose logging
         run: molecule test --all -- -vv
         env:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
           MOLECULE_DISTRO: ${{ matrix.distro }}
+        if: ${{ vars.MOLECULE_DEBUG }} == 'true'
