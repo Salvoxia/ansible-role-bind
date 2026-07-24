@@ -73,17 +73,19 @@ jobs:
         if: matrix.distro != 'centos8' && matrix.distro != 'debian10'
 
       - name: Run Molecule Tests
-        run: molecule --debug test --all -- -vv
+        run: molecule --debug test --all
         env:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
           MOLECULE_DISTRO: ${{ matrix.distro }}
+          ANSIBLE_CONFIG: ${{ github.workspace }}/molecule/ansible.cfg
         if: vars.MOLECULE_DEBUG != 'true'
 
       - name: Run Molecule Tests with verbose logging
-        run: molecule test --all -- -vv
+        run: molecule  --debug test --all -- -vv
         env:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
           MOLECULE_DISTRO: ${{ matrix.distro }}
+          ANSIBLE_CONFIG: ${{ github.workspace }}/molecule/ansible.cfg
         if: vars.MOLECULE_DEBUG == 'true'

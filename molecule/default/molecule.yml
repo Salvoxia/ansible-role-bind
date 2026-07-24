@@ -84,12 +84,6 @@ platforms:
 
 provisioner:
   name: ansible
-  config_options:
-    defaults:
-      interpreter_python: auto_silent
-      callbacks_enabled: ansible.posix.profile_tasks
-    ssh_connection:
-      pipelining: true
 
 # Runs the verify.yml playbook
 verifier:
