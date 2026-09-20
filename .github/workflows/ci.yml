@@ -77,7 +77,7 @@ jobs:
           molecule --version
           ansible --version
           python -m pip freeze
-          
+
       - name: Run Molecule Tests
         run: molecule --debug test --all
         env:
