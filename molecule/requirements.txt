@@ -1,0 +1,10 @@
+molecule==26.8.0
+molecule-plugins[docker]==26.7.15
+ansible-core==2.21.4
+ansible
+yamllint
+ansible-lint
+docker
+netaddr
+dnspython
+ansible-compat>=25.1.4

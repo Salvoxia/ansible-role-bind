@@ -42,8 +42,6 @@ platforms:
     pre_build_image: true
     # Allocate pseudo-TTY
     tty: true
-    environment:
-      container: docker
 
   - name: ns2
     hostname: ns2
@@ -60,8 +58,6 @@ platforms:
     cgroupns_mode: host
     pre_build_image: true
     tty: true
-    environment:
-      container: docker
 
   - name: ns3
     hostname: ns3
@@ -78,8 +74,6 @@ platforms:
     cgroupns_mode: host
     pre_build_image: true
     tty: true
-    environment:
-      container: docker
 
 
 provisioner:

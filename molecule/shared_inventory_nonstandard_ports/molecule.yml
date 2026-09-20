@@ -35,8 +35,6 @@ platforms:
     cgroupns_mode: host
     pre_build_image: true
     tty: true
-    environment:
-      container: docker
 
   - name: ns5
     hostname: ns5
@@ -55,8 +53,6 @@ platforms:
     cgroupns_mode: host
     pre_build_image: true
     tty: true
-    environment:
-      container: docker
 
 provisioner:
   name: ansible
