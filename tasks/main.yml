@@ -141,12 +141,26 @@
 - name: Gather current service facts
   ansible.builtin.service_facts:
 
+# The public IP is only used to detect whether this host is a primary for a
+# zone. The lookup depends on an external service (api.ipify.org), so a failure
+# must not fail the role; the host's local addresses are used instead.
 - name: Get my public IP
   community.general.ipify_facts:
+  register: bind_ipify_result
+  failed_when: false
+
+- name: Warn if the public IP could not be determined
+  ansible.builtin.debug:
+    msg: >-
+      Could not determine the public IP address ({{ bind_ipify_result.msg | default('unknown error') }}).
+      Only local addresses are used to detect whether this host is a primary.
+  when: bind_ipify_result.ansible_facts.ipify_public_ip is not defined
 
 - name: Set list of all host IP addresses
   ansible.builtin.set_fact:
-    host_all_addresses: "{{ [ipify_public_ip] | union(ansible_all_ipv4_addresses | union(ansible_all_ipv6_addresses)) }}"
+    host_all_addresses: >-
+      {{ ([bind_ipify_result.ansible_facts.ipify_public_ip] if bind_ipify_result.ansible_facts.ipify_public_ip is defined else [])
+         | union(ansible_all_ipv4_addresses | union(ansible_all_ipv6_addresses)) }}
   tags: bind
 
 - name: Initialize bind_zone_auxiliary
