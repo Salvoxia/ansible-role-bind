@@ -20,6 +20,9 @@
         dns_port: 553
       when: "inventory_hostname == 'ns2'"
 
+    - name: Wait until all zones are served
+      ansible.builtin.include_tasks: ../resources/tasks/wait_for_zones.yml
+
     - name: IPv4 Forward lookups
       ansible.builtin.assert:
         that:

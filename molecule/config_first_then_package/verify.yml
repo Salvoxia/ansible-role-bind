@@ -13,6 +13,9 @@
       ansible.builtin.set_fact:
         local_dns: "{{ '@' + ansible_default_ipv4.address }}"
 
+    - name: Wait until all zones are served
+      ansible.builtin.include_tasks: ../resources/tasks/wait_for_zones.yml
+
     - name: IPv4 Forward lookups
       ansible.builtin.assert:
         that:

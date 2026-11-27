@@ -1,0 +1,41 @@
+---
+# Waits until the BIND instance on the current host serves every zone in
+# `bind_zones`. Secondaries are converged in parallel with their primary, so an
+# initial zone transfer may fail and only succeed on BIND's next retry. Running
+# the verify assertions before that would make the tests flaky.
+#
+# The `dig` lookup cannot be used with `until`, since lookups are not
+# re-evaluated on retries. The query is therefore run as a command on the
+# controller, using dnspython (already required by the `dig` lookup).
+#
+# Expects `dns_port` to be set if the host does not listen on port 53.
+
+- name: Wait until all zones are served
+  ansible.builtin.command:
+    argv:
+      - "{{ ansible_playbook_python }}"
+      - "-c"
+      - |
+        import sys
+        import dns.flags, dns.message, dns.query, dns.rcode
+        ip, port, zone, need_aa = sys.argv[1], int(sys.argv[2]), sys.argv[3], sys.argv[4] == "True"
+        response = dns.query.udp(dns.message.make_query(zone, "SOA"), ip, port=port, timeout=3)
+        # With recursion enabled, a host not (yet) serving the zone could still
+        # answer via recursion, so require an authoritative answer unless the
+        # zone is a forward zone.
+        ok = (response.rcode() == dns.rcode.NOERROR and len(response.answer) > 0
+              and (not need_aa or bool(response.flags & dns.flags.AA)))
+        sys.exit(0 if ok else 1)
+      - "{{ ansible_facts['default_ipv4']['address'] }}"
+      - "{{ dns_port | default(53) }}"
+      - "{{ item.name }}"
+      - "{{ item.forwarders is not defined }}"
+  delegate_to: localhost
+  loop: "{{ bind_zones }}"
+  loop_control:
+    label: "{{ item.name }}"
+  register: wait_for_zones_result
+  until: wait_for_zones_result.rc == 0
+  retries: 60
+  delay: 10
+  changed_when: false
